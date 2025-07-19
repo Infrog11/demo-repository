@@ -1,0 +1,26 @@
+#Navegador{
+    padding: left 50%;
+    padding-top: 300px;
+
+}
+#Logo{
+    padding-right: 1300px;
+}
+#fotoperfil{
+    padding-right: 1300px;
+    padding-top:600ox;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color:#96ff4e;
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    margin: 10;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
