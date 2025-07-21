@@ -31,13 +31,37 @@
         <form method="POST">
         <label for="Hor">Ingresar horas trabajadas</label>
         <input type="number" id="hor" name="hor">
-        <button type="subimt">Guardar</button>
+        <button type="subimt" id="button" >Guardar</button>
         </from>
     </div> 
     <br>
     <br>
     <br>
     <br>
-    <print string($horTot)>
+<?php
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $horasNew = floatval($_POST["hor"]);
+        function cargar(){
+            $horGuardar = fopen("Registro.txt", "r") or die("ERROR AL CARGAR"); 
+            while(!feof($horGuardar)){
+                $leer = fgets($horGuardar);
+                return $leer;
+            }
+        }
+         function guardar($horasTot, $horasNew){
+            $horGuardar = fopen("Registro.txt", "w+") or die("ERROR AL GUARDAR"); 
+            fputs($horGuardar,$horasTot);
+            fclose($horGuardar);
+            $horasNew=0;
+        }
+    
+        $horasTot = cargar();
+        $horasTot = $horasTot+$horasNew;
+        print "Las horas trabajadas son: ". $horasTot;
+        guardar($horasTot, $horasNew);
+
+    }
+
+?>
 </body>
 </html> 
