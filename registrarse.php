@@ -27,7 +27,7 @@
 
         <label for="contact"> Metodo de contacto para audiencia (Numero o Correo) </label>
         <br>
-        <input type="number" id="ced" name="ced" required />
+        <input type="number" id="contact" name="contact" required />
         <br>
 
         <label for="Edad"> Edad </label>
@@ -50,5 +50,20 @@
         <a href="ConfirmacionRegistro.html"><button type="submit">Solicitar registro</button></a>
         </div>
     </from>
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nombre = $_POST['nom'];
+    $apellido = $_POST['ape'];
+    $edad = $_POST['edad'];
+    $contacto = $_POST['contact'];
+    $contrasena = $_POST['contrasena'];
+
+    $datos = "Nombre: $nombre.$apellido | Edad: $edad | Contacto: $contacto | Contraseña: $contrasena\n";
+
+    file_put_contents("logins.txt", $datos, FILE_APPEND);
+
+    echo "Datos guardados correctamente.";
+}
+?>
 </body>
 </html>

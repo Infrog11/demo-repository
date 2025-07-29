@@ -31,7 +31,7 @@
         <form method="POST">
         <label for="Hor">Ingresar horas trabajadas</label>
         <input type="number" id="hor" name="hor">
-        <button type="subimt" id="button" >Guardar</button>
+        <button type="subimt" id="button">Guardar</button>
         </from>
     </div> 
     <br>

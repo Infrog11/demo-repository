@@ -22,6 +22,7 @@
     <img src="logoMyCoop.png" height="200px">
     </div>
     <h1>FECHAS</h1>
+    <a href="guardarFechas.php">+</a>
     <table>
     <tr>
         <th>Lunes</th>
@@ -74,6 +75,8 @@
         <td>31</td>
     </tr>
 </table> 
+
+
 
 </body>
 </html>

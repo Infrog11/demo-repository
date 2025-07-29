@@ -19,7 +19,7 @@
         <input type="value" id="passw" name="passw" required />
         <br>
         <br>
-        <a href="Inicio.html"> <button type="submit">Acceder</button> <a>
+        <a href="Inicio.php"> <button type="submit">Acceder</button> <a>
         </div>
     </from>
 </body>
