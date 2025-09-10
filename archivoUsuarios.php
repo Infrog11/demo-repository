@@ -8,14 +8,13 @@
 </head>
 <nav>
     <div id="Navegador">
-        <a href="http://localhost/PROYECTOUTU/usuario.php"><img src="iconoUsuario.png" height="70px"></a>
-        <!--<a href="http://localhost/PROYECTOUTU/inSesion.php"><img src="iconoForo.png" height="70px"></a>-->
-        <a href="http://localhost/PROYECTOUTU/fechas.php"><img src="iconoCalendario.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/comunicacion.php"><img src="iconoComunicacion.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/archivo.php"><img src="iconoDocumentos.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/configuracion.php"><img src="iconoConfiguracion.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/notificaciones.php"><img src="iconoNotificacion.png" height="70px"></a>
-        <a href="TesoreroAdmin.php"><img src="Tesorero.png" height="70px"></a>
+        <a href="usuarioUsuario.php"><img src="iconoUsuario.png" height="70px"></a>
+        <a href="fechasUsuarios.php"><img src="iconoCalendario.png" height="70px"></a>
+        <a href="comunicacionUsuarios.php"><img src="iconoComunicacion.png" height="70px"></a>
+        <a href="archivoUsuarios.php"><img src="iconoDocumentos.png" height="70px"></a>
+        <a href="configuracionUsuarios.php"><img src="iconoConfiguracion.png" height="70px"></a>
+        <a href="notificacionesUsuario.php"><img src="iconoNotificacion.png" height="70px"></a>
+        <a href="TesoreroUsuario.php"><img src="Tesorero.png" height="70px"></a>
     </div>
 </nav>
 <body>
@@ -23,7 +22,7 @@
         <img src="logoMyCoop.png" height="200px">
     </div>
     <h1>ARCHIVOS DE LA COOPERATIVA</h1>
-    <a href="subircomprobante.php">Subir Archivo</a>  
+    <!--<a href="subircomprobante.php">Subir Archivo</a>  -->
 
 <?php
 // --- CONEXIÓN A LA BD ---

@@ -8,15 +8,13 @@
 </head>
 <nav>
     <div id="Navegador">
-        <a href="aprobarUsuarios.php"><img src="iconoAdministracion.png" height="70px"></a>
-        <a href="usuario.php"><img src="iconoUsuario.png" height="70px"></a>
-        <a href="fechas.php"><img src="iconoCalendario.png" height="70px"></a>
-        <a href="comunicacion.php"><img src="iconoComunicacion.png" height="70px"></a>
-        <a href="archivo.php"><img src="iconoDocumentos.png" height="70px"></a>
-        <a href="Construccion.php"><img src="iconoConstruccion.png" height="70px"></a>
-        <a href="configuracion.php"><img src="iconoConfiguracion.png" height="70px"></a>
-        <a href="notificaciones.php"><img src="iconoNotificacion.png" height="70px"></a>
-        <a href="TesoreroAdmin.php"><img src="Tesorero.png" height="70px"></a>    
+        <a href="usuarioUsuario.php"><img src="iconoUsuario.png" height="70px"></a>
+        <a href="fechasUsuarios.php"><img src="iconoCalendario.png" height="70px"></a>
+        <a href="comunicacionUsuarios.php"><img src="iconoComunicacion.png" height="70px"></a>
+        <a href="archivoUsuarios.php"><img src="iconoDocumentos.png" height="70px"></a>
+        <a href="configuracionUsuarios.php"><img src="iconoConfiguracion.png" height="70px"></a>
+        <a href="notificacionesUsuario.php"><img src="iconoNotificacion.png" height="70px"></a>
+        <a href="TesoreroUsuario.php"><img src="Tesorero.png" height="70px"></a>
     </div>
 </nav>
 <body>
@@ -24,8 +22,8 @@
         <img src="logoMyCoop.png" height="200px">
     </div>
     <h1>Novedades</h1>
-    <a href="añadirNovedades.php">+</a>
-    <a href="eliminarNovedades.php">-</a>
+    <!--<a href="añadirNovedades.php">+</a>
+    <a href="eliminarNovedades.php">-</a>-->
     
     <?php
     // Conexión a la base de datos

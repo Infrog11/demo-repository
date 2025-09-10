@@ -8,13 +8,13 @@
 </head>
 <nav>
     <div id="Navegador">
-        <a href="http://localhost/PROYECTOUTU/usuario.php"><img src="iconoUsuario.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/fechas.php"><img src="iconoCalendario.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/comunicacion.php"><img src="iconoComunicacion.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/archivo.php"><img src="iconoDocumentos.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/configuracion.php"><img src="iconoConfiguracion.png" height="70px"></a>
-        <a href="http://localhost/PROYECTOUTU/inSesion.php"><img src="iconoNotificacion.png" height="70px"></a>
-        <a href="TesoreroAdmin.php"><img src="Tesorero.png" height="70px"></a>    
+        <a href="usuarioTesorero.php"><img src="iconoUsuario.png" height="70px"></a>
+        <a href="fechasTesorero.php"><img src="iconoCalendario.png" height="70px"></a>
+        <a href="comunicacionTesorero.php"><img src="iconoComunicacion.png" height="70px"></a>
+        <a href="archivoTesorero.php"><img src="iconoDocumentos.png" height="70px"></a>
+        <a href="configuracionTesorero.php"><img src="iconoConfiguracion.png" height="70px"></a>
+        <a href="notificacionesTesorero.php"><img src="iconoNotificacion.png" height="70px"></a>
+        <a href="SeccionTesorero.php"><img src="Tesorero.png" height="70px"></a>
     </div>
 </nav>
 <body>
@@ -126,6 +126,6 @@ mostrarCalendario($mesActual, $anioActual, $eventos);
 
 $conn->close();
 ?>
-<a href="guardarFechas.php">Añadir fechas</a>
+<!--<a href="guardarFechas.php">Añadir fechas</a>-->
 </body>
 </html>
