@@ -29,7 +29,7 @@
 $servername = "localhost";
 $username   = "root";       // cámbialo si usas otro usuario
 $password   = "equipoinfrog";           // tu contraseña de MySQL si tienes
-$database   = "proyecto_database2"; // cambia por el nombre de tu BD real
+$database   = "proyect_database_mycoop6"; // cambia por el nombre de tu BD real
 
 $conn = new mysqli($servername, $username, $password, $database);
 

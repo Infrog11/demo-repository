@@ -1,17 +1,17 @@
 <?php
 session_start();
 
-// Solo administradores pueden acceder
+
 if (!isset($_SESSION["Rol"]) || $_SESSION["Rol"] !== "administrador") {
     header("Location: login.php");
     exit();
 }
 
-// Conexión a la base de datos
-$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop2");
+
+$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- ASIGNAR UNIDAD HABITACIONAL ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"]) && $_POST["tipo_accion"] === "asignar") {
     $cedula = intval($_POST["cedula"]);
     $idUH = intval($_POST["idUH"]);
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"]) && $_P
     $check->close();
 }
 
-// --- ACTUALIZAR HORAS ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"]) && $_POST["tipo_accion"] === "horas") {
     $cedula = intval($_POST["cedula"]);
     $idUH = intval($_POST["idUH"]);
@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"]) && $_P
     $stmt->close();
 }
 
-// --- ACTUALIZAR ETAPA/DESCRIPCIÓN ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"]) && $_POST["tipo_accion"] === "editar") {
     $cedula = intval($_POST["cedula"]);
     $idUH = intval($_POST["idUH"]);
@@ -105,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"]) && $_P
     $update->close();
 }
 
-// --- CONSULTAR TODOS LOS REGISTROS ---
+
 $sql = "
     SELECT c.Cedula, p.Nombre, p.Apellido, c.IdUH, c.Etapa, c.HorasTotales, c.HorasSemanales, c.SemanaInicio, c.DescripcionConst
     FROM Construye c
@@ -119,25 +119,116 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <title>Panel de Construcción</title>
+    </head>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
-        h1 { color: #333; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; background: #fff; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { background: #eee; }
-        form { margin: 0; }
-        input, textarea, select { margin: 5px; padding: 5px; width: 95%; }
-        button { padding: 5px 10px; }
-        .msg { margin: 15px 0; font-weight: bold; }
-        .form-box { background: #fff; padding: 15px; border: 1px solid #ccc; margin-bottom: 20px; }
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 20px;
+    background: #f4f6f9;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+.msg {
+    margin: 15px auto;
+    padding: 12px;
+    border-radius: 6px;
+    text-align: center;
+    background: #eafaf1;
+    color: #27ae60;
+    width: 60%;
+    font-weight: bold;
+}
+
+.form-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin: 0 auto 30px auto;
+    width: 60%;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+}
+
+.form-box h2 {
+    margin-bottom: 15px;
+    color: #34495e;
+}
+
+input, textarea, select {
+    margin: 8px 0;
+    padding: 8px;
+    width: 95%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border 0.3s;
+}
+
+input:focus, textarea:focus {
+    border: 1px solid #3498db;
+    outline: none;
+}
+
+button {
+    background: #3498db;
+    color: #fff;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+}
+
+th, td {
+    border: 1px solid #eee;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background: #2c3e50;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+tr:nth-child(even) {
+    background: #f9fbfc;
+}
+td form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
     </style>
-</head>
+
 <body>
 <h1>Panel de Construcción</h1>
 
 <?php if (isset($mensaje)) echo "<div class='msg'>$mensaje</div>"; ?>
 
-<!-- Formulario para asignar una UH -->
+
 <div class="form-box">
     <h2>Asignar Unidad Habitacional a un Usuario</h2>
     <form method="POST">
@@ -154,7 +245,7 @@ $result = $conn->query($sql);
     </form>
 </div>
 
-<!-- Tabla de registros -->
+
 <table>
     <tr>
         <th>Cédula</th>
@@ -179,7 +270,7 @@ $result = $conn->query($sql);
         <td><?= $row["SemanaInicio"] ?></td>
         <td><?= htmlspecialchars($row["DescripcionConst"]) ?></td>
 
-        <!-- Form para actualizar horas -->
+    
         <td>
             <form method="POST">
                 <input type="hidden" name="tipo_accion" value="horas">
@@ -190,7 +281,7 @@ $result = $conn->query($sql);
             </form>
         </td>
 
-        <!-- Form para editar etapa y descripción -->
+        
         <td>
             <form method="POST">
                 <input type="hidden" name="tipo_accion" value="editar">

@@ -6,10 +6,69 @@
     <title>MyCoop</title>
     <link rel="stylesheet" href="Style.css" />
 </head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+    text-align: center;
+    padding: 20px;
+}
+
+nav {
+    background-color: #2c3e50;
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+#Navegador {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+#Navegador a img {
+    transition: transform 0.2s;
+}
+
+#Navegador a img:hover {
+    transform: scale(1.1);
+}
+
+#Logo img {
+    margin: 20px 0;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+a {
+    display: inline-block;
+    background-color: #27ae60;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+a:hover {
+    background-color: #219150;
+    transform: translateY(-2px);
+}</style>
 <nav>
     <div id="Navegador">
         <a href="http://localhost/PROYECTOUTU/usuario.php"><img src="iconoUsuario.png" height="70px"></a>
-        <!--<a href="http://localhost/PROYECTOUTU/inSesion.php"><img src="iconoForo.png" height="70px"></a>-->
         <a href="http://localhost/PROYECTOUTU/fechas.php"><img src="iconoCalendario.png" height="70px"></a>
         <a href="http://localhost/PROYECTOUTU/comunicacion.php"><img src="iconoComunicacion.png" height="70px"></a>
         <a href="http://localhost/PROYECTOUTU/archivo.php"><img src="iconoDocumentos.png" height="70px"></a>
@@ -26,11 +85,11 @@
     <a href="subircomprobante.php">Subir Archivo</a>  
 
 <?php
-// --- CONEXIÓN A LA BD ---
+
 $servername = "localhost";
-$username   = "root";       // cámbialo si usas otro usuario
-$password   = "equipoinfrog";           // tu contraseña de MySQL si tienes
-$database   = "proyecto_database2"; // cambia por el nombre de tu BD real
+$username   = "root";      
+$password   = "equipoinfrog";         
+$database   = "proyect_database_mycoop6"; 
 
 $conn = new mysqli($servername, $username, $password, $database);
 
@@ -39,7 +98,6 @@ if ($conn->connect_error) {
 }
 $conn->set_charset("utf8mb4");
 
-// --- CONSULTA A LA TABLA ---
 $sql = "SELECT IdArchivo, NombreArchivo, Fecha, DescripcionArch FROM Archivos ORDER BY Fecha DESC";
 $result = $conn->query($sql);
 

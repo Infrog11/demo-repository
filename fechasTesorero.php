@@ -6,6 +6,48 @@
     <title>MyCoop</title>
     <link rel="stylesheet" href="catStyle.css" />
 </head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #2c3e50;
+    text-align: center;
+    padding: 20px;
+}
+
+#Navegador {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    background: #2c3e50;
+    padding: 12px 0;
+    border-bottom: 4px solid #27ae60;
+    box-shadow: 0px 3px 6px rgba(0,0,0,0.1);
+}
+
+#Navegador a img {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
+}
+
+#Navegador a img:hover {
+    transform: scale(1.15);
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.3);
+}
+
+h1, h2, h3 {
+    color: #34495e;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+</style>
 <nav>
     <div id="Navegador">
         <a href="usuarioTesorero.php"><img src="iconoUsuario.png" height="70px"></a>
@@ -20,9 +62,8 @@
 <body>
 
 <?php
-include "conexion.php"; // archivo de conexión
+include "conexion.php"; 
 
-// ---- LÓGICA DE NAVEGACIÓN ----
 if (isset($_GET['mes']) && isset($_GET['anio'])) {
     $mesActual = intval($_GET['mes']);
     $anioActual = intval($_GET['anio']);
@@ -31,7 +72,6 @@ if (isset($_GET['mes']) && isset($_GET['anio'])) {
     $anioActual = date("Y");
 }
 
-// calcular siguiente mes
 $mesSiguiente = $mesActual + 1;
 $anioSiguiente = $anioActual;
 if ($mesSiguiente > 12) {
@@ -39,7 +79,6 @@ if ($mesSiguiente > 12) {
     $anioSiguiente++;
 }
 
-// calcular anterior mes
 $mesAnterior = $mesActual - 1;
 $anioAnterior = $anioActual;
 if ($mesAnterior < 1) {
@@ -47,7 +86,6 @@ if ($mesAnterior < 1) {
     $anioAnterior--;
 }
 
-// --- cargar eventos de la BD ---
 $sql = "SELECT IdEvento, NombreEvento, FechaEvento, DescripcionEvento 
         FROM Eventos 
         WHERE MONTH(FechaEvento) = ? AND YEAR(FechaEvento) = ?";
@@ -62,7 +100,6 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// --- función para mostrar calendario ---
 function mostrarCalendario($mes, $anio, $eventos) {
     $primerDia = mktime(0, 0, 0, $mes, 1, $anio);
     setlocale(LC_TIME, "es_ES.UTF-8");
@@ -75,9 +112,8 @@ function mostrarCalendario($mes, $anio, $eventos) {
     echo "<tr>
             <th>Lun</th><th>Mar</th><th>Mié</th>
             <th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
-          </tr><tr>";
+        </tr><tr>";
 
-    // espacios antes del primer día
     if ($diaSemana > 1) {
         for ($i = 1; $i < $diaSemana; $i++) {
             echo "<td></td>";
@@ -90,7 +126,6 @@ function mostrarCalendario($mes, $anio, $eventos) {
         
         echo "<td><strong>$dia</strong><br>";
 
-        // mostrar eventos del día
         foreach ($eventos as $evento) {
             if ($evento["FechaEvento"] == $fechaActual) {
                 echo "<div style='background:lightblue; padding:3px; margin:2px; border-radius:5px; font-size:12px;'>";
@@ -111,7 +146,6 @@ function mostrarCalendario($mes, $anio, $eventos) {
     echo "</tr></table><br><br>";
 }
 
-// --- Botones de navegación ---
 echo "<div style='text-align:center; margin:20px;'>
         <a href='?mes=$mesAnterior&anio=$anioAnterior'>
             <button>&laquo; Mes Anterior</button>
@@ -119,13 +153,11 @@ echo "<div style='text-align:center; margin:20px;'>
         <a href='?mes=$mesSiguiente&anio=$anioSiguiente'>
             <button>Mes Siguiente &raquo;</button>
         </a>
-      </div>";
+    </div>";
 
-// mostrar calendario
 mostrarCalendario($mesActual, $anioActual, $eventos);
 
 $conn->close();
 ?>
-<!--<a href="guardarFechas.php">Añadir fechas</a>-->
 </body>
 </html>

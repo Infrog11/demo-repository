@@ -8,23 +8,22 @@
 </head>
 <body>
 <?php
-// --- CONFIGURA TU CONEXIÓN ---
 $servername = "localhost";
-$username   = "root";       // cambia si usas otro usuario
-$password   = "equipoinfrog";           // pon tu contraseña si la tienes
-$database   = "Proyecto_database2"; // usa el nombre real de tu BD
+$username   = "root";       
+$password   = "equipoinfrog";           
+$database   = "Proyect_database_mycoop6"; 
 
 $conn = new mysqli($servername, $username, $password, $database);
 
-// verificar conexión
+
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 $conn->set_charset("utf8mb4");
 
-// procesar formulario
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $fecha = $_POST['fecha'];          // formato YYYY-MM-DD
+    $fecha = $_POST['fecha'];         
     $titulo = $_POST['titulo'];
     $descripcion = $_POST['descripcion'] ?? "";
 

@@ -15,11 +15,10 @@
 
 <?php
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Conexión a la base de datos
     $host = "localhost";
-    $user = "root";        // tu usuario de MySQL
-    $pass = "equipoinfrog";            // tu contraseña
-    $db   = "proyect_database_MyCoop2"; // cámbiala por el nombre real de tu base
+    $user = "root";       
+    $pass = "equipoinfrog";           
+    $db   = "proyect_database_MyCoop6";
     
     $conn = new mysqli($host, $user, $pass, $db);
 
@@ -27,11 +26,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         die("Error de conexión: " . $conn->connect_error);
     }
 
-    // Sanitizar entrada
     $Novedad = trim($_POST["Nov"]);
 
     if (!empty($Novedad)) {
-        // Insertar novedad en la base
+    
         $stmt = $conn->prepare("INSERT INTO Novedades (Novedad) VALUES (?)");
         $stmt->bind_param("s", $Novedad);
 

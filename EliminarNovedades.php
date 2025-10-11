@@ -16,11 +16,11 @@
 
     <?php
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        // Conexión a la BD
+      
         $host = "localhost";
-        $user = "root";        // tu usuario MySQL
-        $pass = "equipoinfrog";            // tu contraseña
-        $db   = "proyect_database_Mycoop2"; // cámbialo por el nombre real
+        $user = "root";        
+        $pass = "equipoinfrog";           
+        $db   = "proyect_database_Mycoop6"; 
 
         $conn = new mysqli($host, $user, $pass, $db);
 
@@ -30,7 +30,7 @@
 
         $id = intval($_POST["idNovedad"]);
 
-        // Verificar si existe antes de eliminar
+     
         $check = $conn->prepare("SELECT * FROM Novedades WHERE idNovedad = ?");
         $check->bind_param("i", $id);
         $check->execute();

@@ -1,9 +1,9 @@
 <?php
-// --- Conexión a la BD ---
-$host = "localhost";   // Cambiar según tu servidor
-$user = "root";        // Usuario de la BD
-$pass = "equipoinfrog";            // Contraseña de la BD
-$db   = "proyect_database_mycoop2"; // Nombre de la BD
+
+$host = "localhost";   
+$user = "root";    
+$pass = "equipoinfrog";            
+$db   = "proyect_database_mycoop6"; 
 
 $conn = new mysqli($host, $user, $pass, $db);
 
@@ -11,7 +11,7 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// --- Registrar nuevo movimiento ---
+
 if (isset($_POST['guardar'])) {
     $monto = $_POST['monto'];
     $descripcion = $_POST['descripcion'];
@@ -26,7 +26,7 @@ if (isset($_POST['guardar'])) {
     }
 }
 
-// --- Calcular saldo total ---
+
 $result = $conn->query("SELECT SUM(Monto) AS saldo FROM FondoMonetario");
 $row = $result->fetch_assoc();
 $saldo = $row['saldo'] ?? 0;

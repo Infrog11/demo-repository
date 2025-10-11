@@ -6,6 +6,77 @@
     <title>MyCoop</title>
     <link rel="stylesheet" href="Style.css" />
 </head>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f6f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+nav {
+    background: #2c3e50;
+    padding: 10px 0;
+    width: 100%;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#Navegador {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#Navegador a img {
+    transition: transform 0.3s, filter 0.3s;
+    border-radius: 50%;
+    padding: 5px;
+    background: #fff;
+}
+
+#Navegador a img:hover {
+    transform: scale(1.15);
+    filter: brightness(1.1);
+}
+#Logo {
+    margin: 30px 0;
+}
+
+#Logo img {
+    border-radius: 20px;
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
+    background: white;
+    padding: 15px;
+}
+
+h1 {
+    margin-top: 10px;
+    color: #2c3e50;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+a {
+    text-decoration: none;
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0 10px;
+    color: #2c3e50;
+    transition: color 0.3s, transform 0.2s;
+}
+
+a:hover {
+    color: #3498db;
+    transform: scale(1.2);
+}
+</style>
 <nav>
     <div id="Navegador">
         <a href="aprobarUsuarios.php"><img src="iconoAdministracion.png" height="70px"></a>
@@ -28,11 +99,11 @@
     <a href="eliminarNovedades.php">-</a>
     
     <?php
-    // Conexión a la base de datos
+    
     $host = "localhost";
-    $user = "root";        // tu usuario de MySQL
-    $pass = "equipoinfrog";            // tu contraseña
-    $db   = "proyect_database_MyCoop2"; // cambia por el nombre de tu base
+    $user = "root";        
+    $pass = "equipoinfrog";           
+    $db   = "proyect_database_MyCoop6"; 
 
     $conn = new mysqli($host, $user, $pass, $db);
 
@@ -40,7 +111,7 @@
         die("Error de conexión: " . $conn->connect_error);
     }
 
-    // Consulta para traer todas las novedades
+
     $sql = "SELECT idNovedad, Novedad FROM Novedades ORDER BY idNovedad DESC";
     $result = $conn->query($sql);
 

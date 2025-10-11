@@ -22,14 +22,14 @@
         <img src="logoMyCoop.png" height="200px">
     </div>
     <h1>ARCHIVOS DE LA COOPERATIVA</h1>
-    <!--<a href="subircomprobante.php">Subir Archivo</a>  -->
+ 
 
 <?php
-// --- CONEXIÓN A LA BD ---
+
 $servername = "localhost";
-$username   = "root";       // cámbialo si usas otro usuario
-$password   = "equipoinfrog";           // tu contraseña de MySQL si tienes
-$database   = "proyecto_database2"; // cambia por el nombre de tu BD real
+$username   = "root";      
+$password   = "equipoinfrog";        
+$database   = "proyect_database_mycoop6"; 
 
 $conn = new mysqli($servername, $username, $password, $database);
 
@@ -38,7 +38,7 @@ if ($conn->connect_error) {
 }
 $conn->set_charset("utf8mb4");
 
-// --- CONSULTA A LA TABLA ---
+
 $sql = "SELECT IdArchivo, NombreArchivo, Fecha, DescripcionArch FROM Archivos ORDER BY Fecha DESC";
 $result = $conn->query($sql);
 

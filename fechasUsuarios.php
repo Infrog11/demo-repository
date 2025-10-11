@@ -20,9 +20,9 @@
 <body>
 
 <?php
-include "conexion.php"; // archivo de conexión
+include "conexion.php"; 
 
-// ---- LÓGICA DE NAVEGACIÓN ----
+
 if (isset($_GET['mes']) && isset($_GET['anio'])) {
     $mesActual = intval($_GET['mes']);
     $anioActual = intval($_GET['anio']);
@@ -31,7 +31,7 @@ if (isset($_GET['mes']) && isset($_GET['anio'])) {
     $anioActual = date("Y");
 }
 
-// calcular siguiente mes
+
 $mesSiguiente = $mesActual + 1;
 $anioSiguiente = $anioActual;
 if ($mesSiguiente > 12) {
@@ -39,7 +39,7 @@ if ($mesSiguiente > 12) {
     $anioSiguiente++;
 }
 
-// calcular anterior mes
+
 $mesAnterior = $mesActual - 1;
 $anioAnterior = $anioActual;
 if ($mesAnterior < 1) {
@@ -47,7 +47,6 @@ if ($mesAnterior < 1) {
     $anioAnterior--;
 }
 
-// --- cargar eventos de la BD ---
 $sql = "SELECT IdEvento, NombreEvento, FechaEvento, DescripcionEvento 
         FROM Eventos 
         WHERE MONTH(FechaEvento) = ? AND YEAR(FechaEvento) = ?";
@@ -62,7 +61,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// --- función para mostrar calendario ---
+
 function mostrarCalendario($mes, $anio, $eventos) {
     $primerDia = mktime(0, 0, 0, $mes, 1, $anio);
     setlocale(LC_TIME, "es_ES.UTF-8");
@@ -77,7 +76,7 @@ function mostrarCalendario($mes, $anio, $eventos) {
             <th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
           </tr><tr>";
 
-    // espacios antes del primer día
+  
     if ($diaSemana > 1) {
         for ($i = 1; $i < $diaSemana; $i++) {
             echo "<td></td>";
@@ -90,7 +89,7 @@ function mostrarCalendario($mes, $anio, $eventos) {
         
         echo "<td><strong>$dia</strong><br>";
 
-        // mostrar eventos del día
+     
         foreach ($eventos as $evento) {
             if ($evento["FechaEvento"] == $fechaActual) {
                 echo "<div style='background:lightblue; padding:3px; margin:2px; border-radius:5px; font-size:12px;'>";
@@ -111,7 +110,7 @@ function mostrarCalendario($mes, $anio, $eventos) {
     echo "</tr></table><br><br>";
 }
 
-// --- Botones de navegación ---
+
 echo "<div style='text-align:center; margin:20px;'>
         <a href='?mes=$mesAnterior&anio=$anioAnterior'>
             <button>&laquo; Mes Anterior</button>
@@ -121,11 +120,10 @@ echo "<div style='text-align:center; margin:20px;'>
         </a>
       </div>";
 
-// mostrar calendario
 mostrarCalendario($mesActual, $anioActual, $eventos);
 
 $conn->close();
 ?>
-<!--<a href="guardarFechas.php">Añadir fechas</a>-->
+
 </body>
 </html>

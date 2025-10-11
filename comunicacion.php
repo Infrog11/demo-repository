@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Verificar que el usuario haya iniciado sesión
+
 if (!isset($_SESSION['Cedula'])) {
     header("Location: login.php");
     exit();
@@ -10,13 +10,13 @@ if (!isset($_SESSION['Cedula'])) {
 $cedula = $_SESSION['Cedula'];
 $mensaje = "";
 
-// Conexión a la base de datos
-$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop2");
+
+$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// Guardar mensaje
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["msg"])) {
     $msg = trim($_POST["msg"]);
 
@@ -42,6 +42,87 @@ $conn->close();
     <title>MyCoop - Enviar Mensaje</title>
     <link rel="stylesheet" href="Style.css" />
 </head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+    text-align: center;
+    padding: 20px;
+}
+
+nav {
+    background-color: #2c3e50;
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+#Navegador {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+#Navegador a img {
+    transition: transform 0.2s ease-in-out;
+}
+
+#Navegador a img:hover {
+    transform: scale(1.1);
+}
+
+#Logo img {
+    margin: 20px 0;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+form {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 60%;
+    margin: 0 auto;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+label {
+    font-weight: bold;
+    color: #34495e;
+}
+
+input[type="text"] {
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #27ae60;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #219150;
+}
+</style>
 <body>
 <nav>
     <div id="Navegador">

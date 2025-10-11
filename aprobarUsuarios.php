@@ -1,23 +1,23 @@
 <?php
 session_start();
 
-// ✅ Solo deja entrar a administradores
+
 if (!isset($_SESSION["Rol"]) || $_SESSION["Rol"] !== "administrador") {
     die("Acceso denegado. Solo administradores pueden entrar aquí.");
 }
 
-// Conexión a la base de datos
+
 $host = "localhost";
 $user = "root";
 $pass = "equipoinfrog";
-$db   = "proyect_database_mycoop2"; 
+$db   = "proyect_database_mycoop6"; 
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// ✅ Aprobar usuario
+
 if (isset($_GET["aprobar"])) {
     $cedulaAprobar = intval($_GET["aprobar"]);
     $stmt = $conn->prepare("UPDATE Persona SET Aceptado = 1 WHERE Cedula = ?");
@@ -27,7 +27,7 @@ if (isset($_GET["aprobar"])) {
     echo "<p style='color:green;'>Usuario con cédula $cedulaAprobar aprobado ✅</p>";
 }
 
-// ✅ Asignar rol
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["cambiarRol"])) {
     $cedula = intval($_POST["cedula"]);
     $nuevoRol = $_POST["rol"];
@@ -42,10 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["cambiarRol"])) {
     $stmt->close();
 }
 
-// ✅ Buscar usuarios pendientes
+
 $resultPendientes = $conn->query("SELECT Cedula, Nombre, Apellido, Comunicacion FROM Persona WHERE Aceptado = 0");
 
-// ✅ Buscar usuarios aprobados
+
 $resultAprobados = $conn->query("SELECT Cedula, Nombre, Apellido, Comunicacion, Rol FROM Persona WHERE Aceptado = 1");
 ?>
 
@@ -56,6 +56,109 @@ $resultAprobados = $conn->query("SELECT Cedula, Nombre, Apellido, Comunicacion, 
     <title>Panel de Aprobación - MyCoop</title>
     <link rel="stylesheet" href="Style.css">
 </head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f4f6f9;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 40px;
+    border-left: 6px solid #3498db;
+    padding-left: 10px;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background: #2c3e50;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+tr:hover {
+    background: #f0f8ff;
+}
+
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+a[href*="aprobar"] {
+    background: #27ae60;
+    color: #fff !important;
+}
+
+a[href*="aprobar"]:hover {
+    background: #1e8449;
+    transform: scale(1.05);
+}
+
+
+select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+button {
+    background: #3498db;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #2c3e50;
+    transform: scale(1.05);
+}
+
+
+p {
+    font-style: italic;
+    color: #555;
+    margin-top: 10px;
+}
+</style>
 <body>
     <h1>Panel de Administración</h1>
 
@@ -77,7 +180,7 @@ $resultAprobados = $conn->query("SELECT Cedula, Nombre, Apellido, Comunicacion, 
                     <td><?= $row["Comunicacion"] ?></td>
                     <td>
                         <a href="aprobarUsuarios.php?aprobar=<?= $row["Cedula"] ?>" 
-                           style="color: green; font-weight: bold;">✔ Aprobar</a>
+                        style="color: green; font-weight: bold;">✔ Aprobar</a>
                     </td>
                 </tr>
             <?php endwhile; ?>

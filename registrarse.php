@@ -6,6 +6,76 @@
     <title>MyCoop - Registrarse</title>
     <link rel="stylesheet" href="StyleInicio.css" />
 </head>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #Inicio {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.25);
+            width: 350px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 5px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #3498db;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2c3e50;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 <body>
     <div id="Inicio">
     <h1>REGISTRARSE</h1>
@@ -49,20 +119,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($password !== $password2) {
         echo "<p style='color:red;'>Las contraseñas no coinciden.</p>";
     } else {
-        // Conectar a la base de datos
-        $conexion = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop2"); 
+        
+        $conexion = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6"); 
         if ($conexion->connect_error) {
             die("Conexión fallida: " . $conexion->connect_error);
         }
 
-        // Query para insertar en la tabla Persona
+        
         $sql = "INSERT INTO Persona 
                 (Cedula, Nombre, Apellido, Direccion, edad, Comunicacion, Contrasena, Aceptado) 
                 VALUES (?, ?, ?, '', ?, ?, ?, 0)";
 
-        // Preparamos el statement
+       
         $stmt = $conexion->prepare($sql);
-        // bind_param: Cedula (i), Nombre (s), Apellido (s), Edad (i), Contacto (s), Password (s)
+        
         $stmt->bind_param("ississ", $Cedula, $Nombre, $Apellido, $edad, $contacto, $password);
 
         if ($stmt->execute()) {

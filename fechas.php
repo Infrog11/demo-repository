@@ -6,6 +6,92 @@
     <title>MyCoop</title>
     <link rel="stylesheet" href="catStyle.css" />
 </head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f6f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+nav {
+    background: #2c3e50;
+    padding: 10px 0;
+    width: 100%;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+#Navegador {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#Navegador a img {
+    transition: transform 0.3s, filter 0.3s;
+    border-radius: 50%;
+    padding: 5px;
+    background: #fff;
+}
+
+#Navegador a img:hover {
+    transform: scale(1.15);
+    filter: brightness(1.1);
+}
+
+main {
+    margin: 30px auto;
+    padding: 20px;
+    max-width: 1000px;
+    width: 90%;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.1);
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+button, .btn {
+    background: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:hover, .btn:hover {
+    background: #2c3e50;
+    transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 <nav>
     <div id="Navegador">
         <a href="http://localhost/PROYECTOUTU/usuario.php"><img src="iconoUsuario.png" height="70px"></a>
@@ -20,9 +106,9 @@
 <body>
 
 <?php
-include "conexion.php"; // archivo de conexión
+include "conexion.php";
 
-// ---- LÓGICA DE NAVEGACIÓN ----
+
 if (isset($_GET['mes']) && isset($_GET['anio'])) {
     $mesActual = intval($_GET['mes']);
     $anioActual = intval($_GET['anio']);
@@ -31,7 +117,7 @@ if (isset($_GET['mes']) && isset($_GET['anio'])) {
     $anioActual = date("Y");
 }
 
-// calcular siguiente mes
+
 $mesSiguiente = $mesActual + 1;
 $anioSiguiente = $anioActual;
 if ($mesSiguiente > 12) {
@@ -39,7 +125,7 @@ if ($mesSiguiente > 12) {
     $anioSiguiente++;
 }
 
-// calcular anterior mes
+
 $mesAnterior = $mesActual - 1;
 $anioAnterior = $anioActual;
 if ($mesAnterior < 1) {
@@ -47,7 +133,7 @@ if ($mesAnterior < 1) {
     $anioAnterior--;
 }
 
-// --- cargar eventos de la BD ---
+
 $sql = "SELECT IdEvento, NombreEvento, FechaEvento, DescripcionEvento 
         FROM Eventos 
         WHERE MONTH(FechaEvento) = ? AND YEAR(FechaEvento) = ?";
@@ -62,7 +148,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// --- función para mostrar calendario ---
+
 function mostrarCalendario($mes, $anio, $eventos) {
     $primerDia = mktime(0, 0, 0, $mes, 1, $anio);
     setlocale(LC_TIME, "es_ES.UTF-8");
@@ -75,9 +161,9 @@ function mostrarCalendario($mes, $anio, $eventos) {
     echo "<tr>
             <th>Lun</th><th>Mar</th><th>Mié</th>
             <th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
-          </tr><tr>";
+        </tr><tr>";
 
-    // espacios antes del primer día
+
     if ($diaSemana > 1) {
         for ($i = 1; $i < $diaSemana; $i++) {
             echo "<td></td>";
@@ -90,7 +176,7 @@ function mostrarCalendario($mes, $anio, $eventos) {
         
         echo "<td><strong>$dia</strong><br>";
 
-        // mostrar eventos del día
+
         foreach ($eventos as $evento) {
             if ($evento["FechaEvento"] == $fechaActual) {
                 echo "<div style='background:lightblue; padding:3px; margin:2px; border-radius:5px; font-size:12px;'>";
@@ -111,7 +197,7 @@ function mostrarCalendario($mes, $anio, $eventos) {
     echo "</tr></table><br><br>";
 }
 
-// --- Botones de navegación ---
+
 echo "<div style='text-align:center; margin:20px;'>
         <a href='?mes=$mesAnterior&anio=$anioAnterior'>
             <button>&laquo; Mes Anterior</button>
@@ -119,9 +205,9 @@ echo "<div style='text-align:center; margin:20px;'>
         <a href='?mes=$mesSiguiente&anio=$anioSiguiente'>
             <button>Mes Siguiente &raquo;</button>
         </a>
-      </div>";
+    </div>";
 
-// mostrar calendario
+
 mostrarCalendario($mesActual, $anioActual, $eventos);
 
 $conn->close();

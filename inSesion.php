@@ -5,11 +5,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $cedula = $_POST["ced"];
     $password = $_POST["passw"];
 
-    // Conexión a la base de datos
+    
     $host = "localhost";
     $user = "root";
     $pass = "equipoinfrog";
-    $db   = "proyect_database_mycoop2"; 
+    $db   = "proyect_database_mycoop6"; 
 
     $conn = new mysqli($host, $user, $pass, $db);
 
@@ -17,23 +17,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         die("Error de conexión: " . $conn->connect_error);
     }
 
-    // Buscar usuario
+    
     $stmt = $conn->prepare("SELECT Cedula, Contrasena, Rol, Aceptado FROM Persona WHERE Cedula = ?");
     $stmt->bind_param("i", $cedula);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($row = $result->fetch_assoc()) {
-        // Primero verificamos si está aprobado
+        
         if ($row["Aceptado"] == 0) {
             echo "<p style='color:red;'>⚠ Tu cuenta aún no fue aprobada por un administrador.</p>";
         } else {
-            // Verificar contraseña (⚠ texto plano; mejor usar password_hash/password_verify)
+            
             if ($password === $row["Contrasena"]) {
                 $_SESSION["Cedula"] = $row["Cedula"];
                 $_SESSION["Rol"] = $row["Rol"];
 
-                // Redirección según rol
+                
                 if ($row["Rol"] === "administrador") {
                     header("Location: inicio.php");
                 } elseif ($row["Rol"] === "usuario") {
@@ -65,6 +65,77 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>MyCoop - Iniciar Sesión</title>
     <link rel="stylesheet" href="StyleInicio.css" />
 </head>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    color: #fff;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+form {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    width: 320px;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+label {
+    display: block;
+    margin: 12px 0 5px;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #2a5298;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: #2a5298;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #1e3c72;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 <body>
     <h1>INICIAR SESIÓN</h1>
     <form method="POST">

@@ -21,20 +21,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $descripcion = $_POST['descripcion'];
     $archivo = $_FILES['comprobante'];
 
-    // Crear carpeta "uploads" si no existe
     if (!file_exists("uploads")) {
         mkdir("uploads");
     }
 
-    // Generar destino único para evitar sobrescritura
     $destino = "uploads/" . time() . "_" . basename($archivo['name']);
 
     if (move_uploaded_file($archivo['tmp_name'], $destino)) {
-        // Conectar a la base de datos
+       
         $servername = "localhost";
-        $username   = "root";      // cambia si usas otro usuario
-        $password   = "equipoinfrog";          // agrega tu contraseña si tienes
-        $database   = "proyecto_database2"; // cámbialo por el nombre de tu BD real
+        $username   = "root";      
+        $password   = "equipoinfrog";          
+        $database   = "proyect_database_mycoop6"; 
 
         $conn = new mysqli($servername, $username, $password, $database);
 
@@ -43,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
         $conn->set_charset("utf8mb4");
 
-        // Insertar registro en la BD
+    
         $fechaHoy = date("Y-m-d");
         $sql = "INSERT INTO Archivos (NombreArchivo, Fecha, DescripcionArch) 
                 VALUES (?, ?, ?)";

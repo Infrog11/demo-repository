@@ -22,15 +22,14 @@
         <img src="logoMyCoop.png" height="200px">
     </div>
     <h1>Novedades</h1>
-    <!--<a href="añadirNovedades.php">+</a>
-    <a href="eliminarNovedades.php">-</a>-->
+ 
     
     <?php
-    // Conexión a la base de datos
+
     $host = "localhost";
-    $user = "root";        // tu usuario de MySQL
-    $pass = "equipoinfrog";            // tu contraseña
-    $db   = "proyect_database_MyCoop2"; // cambia por el nombre de tu base
+    $user = "root";      
+    $pass = "equipoinfrog";           
+    $db   = "proyect_database_MyCoop6";
 
     $conn = new mysqli($host, $user, $pass, $db);
 
@@ -38,7 +37,7 @@
         die("Error de conexión: " . $conn->connect_error);
     }
 
-    // Consulta para traer todas las novedades
+ 
     $sql = "SELECT idNovedad, Novedad FROM Novedades ORDER BY idNovedad DESC";
     $result = $conn->query($sql);
 

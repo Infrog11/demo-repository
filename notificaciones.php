@@ -1,16 +1,15 @@
 <?php
 session_start();
 
-// Solo administradores pueden acceder
 if (!isset($_SESSION["Rol"]) || $_SESSION["Rol"] !== "administrador") {
     header("Location: login.php");
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop2");
+$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- Responder mensaje ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['idMensaje'], $_POST['respuesta'])) {
     $idMensaje = intval($_POST['idMensaje']);
     $respuesta = trim($_POST['respuesta']);
@@ -21,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['idMensaje'], $_POST['
     $stmt->close();
 }
 
-// --- Aprobar usuario pendiente ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['cedulaAprobar'])) {
     $cedula = intval($_POST['cedulaAprobar']);
     $stmt = $conn->prepare("UPDATE Persona SET Aceptado = 1 WHERE Cedula = ?");
@@ -30,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['cedulaAprobar'])) {
     $stmt->close();
 }
 
-// --- Traer mensajes no archivados ---
+
 $result = $conn->query("
     SELECT m.idMensaje, m.Mensaje, p.Nombre, p.Apellido
     FROM Mensajes m
@@ -39,7 +38,7 @@ $result = $conn->query("
     ORDER BY m.idMensaje ASC
 ");
 
-// --- Traer usuarios pendientes ---
+
 $pendientes = $conn->query("
     SELECT Cedula, Nombre, Apellido, Edad, Comunicacion
     FROM Persona
@@ -53,15 +52,81 @@ $pendientes = $conn->query("
 <head>
 <meta charset="UTF-8">
 <title>Bandeja de Mensajes y Usuarios Pendientes - Admin</title>
-<style>
-table { border-collapse: collapse; width: 90%; margin-bottom: 20px; }
-th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-th { background-color: #eee; }
-textarea { width: 100%; height: 60px; }
-button { padding: 5px 10px; margin-top: 5px; }
-.archivado { background-color: #f9f9f9; }
-</style>
 </head>
+<style>
+    body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 20px;
+    background: #f4f6f9;
+    color: #333;
+}
+
+h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 95%;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+}
+
+th, td {
+    border: 1px solid #eee;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background: #2c3e50;
+    color: #fff;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background: #f9fbfc;
+}
+
+textarea {
+    width: 100%;
+    height: 70px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    transition: border 0.3s;
+}
+
+textarea:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.archivado {
+    background-color: #f0f0f0;
+    font-style: italic;
+}
+</style>
 <body>
 <h1>Bandeja de Mensajes - Administrador</h1>
 

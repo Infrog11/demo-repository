@@ -1,8 +1,8 @@
 <?php
-$host = "localhost";     // igual que en Workbench
-$user = "root";          // usuario de MySQL
-$pass = "equipoinfrog"; // la misma que usás en Workbench
-$db   = "Proyecto_database2"; // nombre de la base creada
+$host = "localhost";     
+$user = "root";          
+$pass = "equipoinfrog"; 
+$db   = "Proyect_database_Mycoop6"; 
 
 $conn = new mysqli($host, $user, $pass, $db);
 

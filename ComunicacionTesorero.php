@@ -11,7 +11,7 @@ $cedula = $_SESSION['Cedula'];
 $mensaje = "";
 
 // Conexión a la base de datos
-$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop2");
+$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }

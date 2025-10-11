@@ -11,7 +11,7 @@ if (!isset($_SESSION['Cedula'])) {
 $host = "localhost";
 $user = "root";
 $pass = "equipoinfrog";
-$db   = "proyect_database_mycoop2";
+$db   = "proyect_database_mycoop6";
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
@@ -22,8 +22,8 @@ $ced = (int) $_SESSION['Cedula'];
 // Traer datos del usuario
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, edad AS Edad,
-           COALESCE(Pronombres, '') AS Pronombres,
-           COALESCE(FotoPerfil, 'DefaultPerfile.png') AS FotoPerfil
+        COALESCE(Pronombres, '') AS Pronombres,
+        COALESCE(FotoPerfil, 'DefaultPerfile.png') AS FotoPerfil
     FROM Persona WHERE Cedula = ?
 ");
 $stmt->bind_param("i", $ced);
@@ -125,6 +125,113 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["foto"])) {
     <title>MyCoop</title>
     <link rel="stylesheet" href="usuario.css" />
 </head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #2c3e50;
+    text-align: center;
+    padding: 20px;
+}
+
+#Navegador {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background: #2c3e50;
+    padding: 10px 0;
+    margin-bottom: 30px;
+}
+
+#Navegador a img {
+    transition: transform 0.2s ease;
+}
+
+#Navegador a img:hover {
+    transform: scale(1.15);
+}
+
+#Logo img {
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+}
+
+h1 {
+    color: #27ae60;
+    margin-bottom: 25px;
+}
+
+#fotoperfil {
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 90%;
+}
+
+#fotoperfil img {
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+#fotoperfil p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+#fotoperfil form {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+#fotoperfil input[type="text"],
+#fotoperfil input[type="file"],
+#fotoperfil input[type="number"] {
+    padding: 8px;
+    width: 80%;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    transition: border 0.3s;
+}
+
+#fotoperfil input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+#fotoperfil button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#fotoperfil button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+#fotoperfil p[style*="color:red"] {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+</style>
 
 <body>
 <nav>
@@ -154,27 +261,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["foto"])) {
         <?php echo $usuario['Pronombres'] !== '' ? htmlspecialchars($usuario['Pronombres']) : "No definidos"; ?>
     </p>
 
-    <!-- Editar pronombres -->
     <form method="POST" action="">
         <label for="pronombres">Editar pronombres:</label>
         <input type="text" id="pronombres" name="pronombres" placeholder="Ej: él/ella/elle" required>
         <button type="submit">Guardar</button>
     </form>
 
-    <!-- Subir foto de perfil -->
     <h3>Cambiar foto de perfil</h3>
     <form method="POST" enctype="multipart/form-data">
         <input type="file" name="foto" accept="image/*" required>
         <button type="submit">Subir</button>
     </form>
 
-    <!-- Mostrar horas -->
     <h3>Horas trabajadas</h3>
     <?php if ($construccion): ?>
         <p><b>Totales:</b> <?php echo (int)$construccion['HorasTotales']; ?> horas</p>
         <p><b>Semanales:</b> <?php echo (int)$construccion['HorasSemanales']; ?> horas (máx. 168)</p>
 
-        <!-- Sumar horas -->
         <form method="POST" action="">
             <label for="hor">Ingresar horas trabajadas</label>
             <input type="number" id="hor" name="hor" min="0" max="24" required>

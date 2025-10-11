@@ -1,17 +1,14 @@
 <?php
 session_start();
-
-// Si no hay sesión, redirigir al login
 if (!isset($_SESSION['Cedula'])) {
     header("Location: login.php");
     exit();
 }
 
-// Conexión
 $host = "localhost";
 $user = "root";
 $pass = "equipoinfrog";
-$db   = "proyect_database_mycoop2";
+$db   = "proyect_database_mycoop6";
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
@@ -19,7 +16,7 @@ if ($conn->connect_error) {
 
 $ced = (int) $_SESSION['Cedula'];
 
-// Traer datos del usuario
+
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, edad AS Edad,
            COALESCE(Pronombres, '') AS Pronombres,
@@ -30,7 +27,7 @@ $stmt->bind_param("i", $ced);
 $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 
-// Traer datos de construcción (si existen)
+
 $stmt2 = $conn->prepare("
     SELECT IdUH, Etapa, HorasTotales, HorasSemanales, SemanaInicio
     FROM Construye WHERE Cedula = ?
@@ -39,7 +36,6 @@ $stmt2->bind_param("i", $ced);
 $stmt2->execute();
 $construccion = $stmt2->get_result()->fetch_assoc();
 
-// --- Reinicio semanal automático ---
 if ($construccion) {
     $hoy = new DateTime();
     $inicioSemanaActual = $hoy->modify("monday this week")->format("Y-m-d");
@@ -53,7 +49,7 @@ if ($construccion) {
     }
 }
 
-// --- Editar pronombres ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pronombres"])) {
     $pronombres = trim($_POST["pronombres"]);
     $update = $conn->prepare("UPDATE Persona SET Pronombres = ? WHERE Cedula = ?");
@@ -62,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pronombres"])) {
     $usuario['Pronombres'] = $pronombres;
 }
 
-// --- Sumar horas ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
     $horasNew = (int) $_POST["hor"];
     if ($horasNew < 0) $horasNew = 0;
@@ -90,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
     }
 }
 
-// --- Subir foto de perfil ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["foto"])) {
     $dir = "uploads/";
     if (!is_dir($dir)) {
@@ -154,27 +150,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["foto"])) {
         <?php echo $usuario['Pronombres'] !== '' ? htmlspecialchars($usuario['Pronombres']) : "No definidos"; ?>
     </p>
 
-    <!-- Editar pronombres -->
     <form method="POST" action="">
         <label for="pronombres">Editar pronombres:</label>
         <input type="text" id="pronombres" name="pronombres" placeholder="Ej: él/ella/elle" required>
         <button type="submit">Guardar</button>
     </form>
 
-    <!-- Subir foto de perfil -->
     <h3>Cambiar foto de perfil</h3>
     <form method="POST" enctype="multipart/form-data">
         <input type="file" name="foto" accept="image/*" required>
         <button type="submit">Subir</button>
     </form>
 
-    <!-- Mostrar horas -->
     <h3>Horas trabajadas</h3>
     <?php if ($construccion): ?>
         <p><b>Totales:</b> <?php echo (int)$construccion['HorasTotales']; ?> horas</p>
         <p><b>Semanales:</b> <?php echo (int)$construccion['HorasSemanales']; ?> horas (máx. 168)</p>
 
-        <!-- Sumar horas -->
+      
         <form method="POST" action="">
             <label for="hor">Ingresar horas trabajadas</label>
             <input type="number" id="hor" name="hor" min="0" max="24" required>

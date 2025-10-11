@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Verificar que el usuario haya iniciado sesión
+
 if (!isset($_SESSION['Cedula'])) {
     header("Location: login.php");
     exit();
@@ -9,11 +9,11 @@ if (!isset($_SESSION['Cedula'])) {
 
 $cedula = $_SESSION['Cedula'];
 
-// Conexión a la base de datos
-$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop2");
+
+$conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- Enviar un mensaje nuevo ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['mensaje'])) {
     $mensaje = trim($_POST['mensaje']);
     if ($mensaje !== "") {
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['mensaje'])) {
     }
 }
 
-// --- Traer mensajes del usuario ---
+
 $stmt = $conn->prepare("
     SELECT Mensaje, Respuesta, Archivado 
     FROM Mensajes 
