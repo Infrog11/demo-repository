@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// Si no hay sesión, redirigir al login
 if (!isset($_SESSION['Cedula'])) {
     header("Location: login.php");
     exit();
 }
 
-// Conexión
 $host = "localhost";
 $user = "root";
 $pass = "equipoinfrog";
@@ -19,7 +17,11 @@ if ($conn->connect_error) {
 
 $ced = (int) $_SESSION['Cedula'];
 
-// Traer datos del usuario
+
+// =====================================================================
+// 1) DATOS DEL USUARIO
+// =====================================================================
+
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, edad AS Edad,
         COALESCE(Pronombres, '') AS Pronombres,
@@ -30,7 +32,30 @@ $stmt->bind_param("i", $ced);
 $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 
-// Traer datos de construcción (si existen)
+
+// =====================================================================
+// 2) CONFIGURACIONES DEL USUARIO
+// =====================================================================
+
+$stmtConf = $conn->prepare("
+    SELECT font_size, theme, icons 
+    FROM configuracionUsuario 
+    WHERE Cedula = ?
+");
+$stmtConf->bind_param("i", $ced);
+$stmtConf->execute();
+$config = $stmtConf->get_result()->fetch_assoc();
+
+// Valores por defecto si no hay configuración guardada
+$fontSize = isset($config["font_size"]) ? (int)$config["font_size"] : 3;
+$theme = isset($config["theme"]) ? $config["theme"] : "light";      // light / dark
+$iconsMode = isset($config["icons"]) ? $config["icons"] : "icons";  // icons / words
+
+
+// =====================================================================
+// 3) DATOS DE CONSTRUCCIÓN
+// =====================================================================
+
 $stmt2 = $conn->prepare("
     SELECT IdUH, Etapa, HorasTotales, HorasSemanales, SemanaInicio
     FROM Construye WHERE Cedula = ?
@@ -39,30 +64,43 @@ $stmt2->bind_param("i", $ced);
 $stmt2->execute();
 $construccion = $stmt2->get_result()->fetch_assoc();
 
-// --- Reinicio semanal automático ---
 if ($construccion) {
     $hoy = new DateTime();
     $inicioSemanaActual = $hoy->modify("monday this week")->format("Y-m-d");
 
     if ($construccion["SemanaInicio"] !== $inicioSemanaActual) {
-        $reset = $conn->prepare("UPDATE Construye SET HorasSemanales = 0, SemanaInicio = ? WHERE Cedula = ?");
+        $reset = $conn->prepare("
+            UPDATE Construye 
+            SET HorasSemanales = 0, SemanaInicio = ? 
+            WHERE Cedula = ?
+        ");
         $reset->bind_param("si", $inicioSemanaActual, $ced);
         $reset->execute();
+
         $construccion["HorasSemanales"] = 0;
         $construccion["SemanaInicio"] = $inicioSemanaActual;
     }
 }
 
-// --- Editar pronombres ---
+
+// =====================================================================
+// 4) ACTUALIZAR PRONOMBRES
+// =====================================================================
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pronombres"])) {
     $pronombres = trim($_POST["pronombres"]);
     $update = $conn->prepare("UPDATE Persona SET Pronombres = ? WHERE Cedula = ?");
     $update->bind_param("si", $pronombres, $ced);
     $update->execute();
+
     $usuario['Pronombres'] = $pronombres;
 }
 
-// --- Sumar horas ---
+
+// =====================================================================
+// 5) REGISTRO DE HORAS
+// =====================================================================
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
     $horasNew = (int) $_POST["hor"];
     if ($horasNew < 0) $horasNew = 0;
@@ -70,7 +108,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
     if ($construccion) {
         $horasTotales = $construccion["HorasTotales"];
         $horasSemanales = $construccion["HorasSemanales"];
-        $semanaInicio = $construccion["SemanaInicio"];
 
         if ($horasSemanales + $horasNew > 168) {
             $error = "⚠ No puedes registrar más de 168 horas en una semana.";
@@ -78,7 +115,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
             $horasTotales += $horasNew;
             $horasSemanales += $horasNew;
 
-            $update = $conn->prepare("UPDATE Construye SET HorasTotales=?, HorasSemanales=? WHERE Cedula=?");
+            $update = $conn->prepare("
+                UPDATE Construye 
+                SET HorasTotales=?, HorasSemanales=? 
+                WHERE Cedula=?
+            ");
             $update->bind_param("iii", $horasTotales, $horasSemanales, $ced);
             $update->execute();
 
@@ -90,12 +131,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
     }
 }
 
-// --- Subir foto de perfil ---
+
+// =====================================================================
+// 6) SUBIR FOTO
+// =====================================================================
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["foto"])) {
     $dir = "uploads/";
-    if (!is_dir($dir)) {
-        mkdir($dir, 0777, true);
-    }
+    if (!is_dir($dir)) mkdir($dir, 0777, true);
 
     $nombreArchivo = $ced . "_" . basename($_FILES["foto"]["name"]);
     $rutaDestino = $dir . $nombreArchivo;
@@ -120,174 +163,174 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["foto"])) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MyCoop</title>
-    <link rel="stylesheet" href="usuario.css" />
-</head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MyCoop</title>
+
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0px;
+    padding: 0px;
+
+    font-size: <?= $fontSize * 4 ?>px;
+
+    <?php if ($theme === "dark"): ?>
+        background: #1e1e1e;
+        color: #ffffff;
+    <?php else: ?>
+        background: #f4f6f9;
+        color: #333;
+    <?php endif; ?>
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-body {
-    background-color: #f5f7fa;
-    color: #2c3e50;
-    text-align: center;
-    padding: 20px;
+nav {
+    <?php if ($theme === "dark"): ?>
+        background: #111;
+    <?php else: ?>
+        background: #2c3e50;
+    <?php endif; ?>
+    padding: 10px 0;
+    width: 100%;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
 }
 
 #Navegador {
     display: flex;
     justify-content: center;
     gap: 20px;
-    background: #2c3e50;
-    padding: 10px 0;
-    margin-bottom: 30px;
+}
+
+#Navegador a {
+    text-decoration: none;
+    color: inherit;
+    font-weight: bold;
 }
 
 #Navegador a img {
-    transition: transform 0.2s ease;
+    transition: transform 0.3s, filter 0.3s;
+    border-radius: 50%;
+    padding: 5px;
+    background: #fff;
 }
 
-#Navegador a img:hover {
-    transform: scale(1.15);
+#Logo {
+    position: absolute;
+    top: 7px;
+    left: 10px;
 }
 
 #Logo img {
-    margin-bottom: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
-}
-
-h1 {
-    color: #27ae60;
-    margin-bottom: 25px;
+    height: 120px;
+    border-radius: 20px;
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
+    background: white;
+    padding: 15px;
 }
 
 #fotoperfil {
     background: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    display: inline-block;
-    box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
+    padding: 25px 35px;
+    border-radius: 15px;
+    margin-top: 20px;
     max-width: 500px;
-    width: 90%;
+    width: 100%;
+    text-align: center;
+
+    <?php if ($theme === "dark"): ?>
+        background: #222;
+        color: #fff;
+    <?php endif; ?>
 }
 
 #fotoperfil img {
     border-radius: 50%;
     margin-bottom: 15px;
+    border: 3px solid #2c3e50;
 }
-
-#fotoperfil p {
-    margin: 8px 0;
-    font-size: 16px;
-}
-
-#fotoperfil form {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-}
-
-#fotoperfil input[type="text"],
-#fotoperfil input[type="file"],
-#fotoperfil input[type="number"] {
-    padding: 8px;
-    width: 80%;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    transition: border 0.3s;
-}
-
-#fotoperfil input:focus {
-    border-color: #3498db;
-    outline: none;
-}
-
-#fotoperfil button {
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-#fotoperfil button:hover {
-    background: #2980b9;
-    transform: translateY(-2px);
-}
-
-#fotoperfil p[style*="color:red"] {
-    font-weight: bold;
-    margin-top: 10px;
-}
-
 </style>
 
+</head>
 <body>
+
+<!-- LOGO -->
+<div id="Logo">
+    <img src="logoMyCoop.png" alt="Logo MyCoop">
+</div>
+
+<!-- MENÚ ADAPTADO -->
 <nav>
     <div id="Navegador">
-        <a href="usuarioTesorero.php"><img src="iconoUsuario.png" height="70px"></a>
-        <a href="fechasTesorero.php"><img src="iconoCalendario.png" height="70px"></a>
-        <a href="comunicacionTesorero.php"><img src="iconoComunicacion.png" height="70px"></a>
-        <a href="archivoTesorero.php"><img src="iconoDocumentos.png" height="70px"></a>
-        <a href="configuracionTesorero.php"><img src="iconoConfiguracion.png" height="70px"></a>
-        <a href="notificacionesTesorero.php"><img src="iconoNotificacion.png" height="70px"></a>
-        <a href="SeccionTesorero.php"><img src="Tesorero.png" height="70px"></a>
+
+        <?php if ($config["icons"] === "icons"): ?>
+            <a href="inicioTesorero.php"><img src="anuncios.png" height="70px"></a>
+            <a href="fechasTesorero.php"><img src="iconoCalendario.png"height="70px"></a>
+            <a href="comunicacionTesorero.php"><img src="iconoComunicacion.png"height="70px"></a>
+            <a href="archivoTesorero.php"><img src="iconoDocumentos.png"height="70px"></a>
+            <a href="foroTesorero.php"><img src="redes-sociales.png"height="70px"></a>
+            <a href="configuracionTesorero.php"><img src="iconoConfiguracion.png"height="70px"></a>
+            <a href="notificacionesTesorero.php"><img src="iconoNotificacion.png"height="70px"></a>
+            <a href="SeccionTesorero.php"><img src="Tesorero.png"height="70px"></a>
+
+        <?php else: ?>
+            <a href="inicioTesorero.php">Novedades</a>
+            <a href="fechasTesorero.php">Calendario</a>
+            <a href="comunicacionTesorero.php">Comunicación</a>
+            <a href="archivoTesorero.php">Archivos</a>
+            <a href="foroTesorero.php">Foro</a>
+            <a href="configuracionTesorero.php">Configuración</a>
+            <a href="notificacionesTesorero.php">Notificaciones</a>
+            <a href="seccionTesorero.php">Tesorería</a>
+        <?php endif; ?>
+
     </div>
 </nav>
 
-<div id="Logo">
-    <img src="logoMyCoop.png" height="200px" alt="Logo MyCoop">
-</div>
 
 <h1>USUARIO</h1>
+
 <div id="fotoperfil">
-    <img src="<?php echo htmlspecialchars($usuario['FotoPerfil']); ?>" height="150px" alt="Foto de perfil">
+    <img src="<?= htmlspecialchars($usuario['FotoPerfil']); ?>" height="150">
 
-    <p><b>Nombre:</b> <?php echo htmlspecialchars($usuario['Nombre']); ?></p>
-    <p><b>Apellido:</b> <?php echo htmlspecialchars($usuario['Apellido']); ?></p>
-    <p><b>Edad:</b> <?php echo htmlspecialchars($usuario['Edad']); ?></p>
-    <p><b>Pronombres:</b> 
-        <?php echo $usuario['Pronombres'] !== '' ? htmlspecialchars($usuario['Pronombres']) : "No definidos"; ?>
-    </p>
+    <p><b>Nombre:</b> <?= htmlspecialchars($usuario['Nombre']) ?></p>
+    <p><b>Apellido:</b> <?= htmlspecialchars($usuario['Apellido']) ?></p>
+    <p><b>Edad:</b> <?= htmlspecialchars($usuario['Edad']) ?></p>
+    <p><b>Pronombres:</b> <?= $usuario['Pronombres'] !== '' ? htmlspecialchars($usuario['Pronombres']) : "No definidos" ?></p>
 
-    <form method="POST" action="">
+    <form method="POST">
         <label for="pronombres">Editar pronombres:</label>
-        <input type="text" id="pronombres" name="pronombres" placeholder="Ej: él/ella/elle" required>
+        <input type="text" id="pronombres" name="pronombres" required>
         <button type="submit">Guardar</button>
     </form>
 
     <h3>Cambiar foto de perfil</h3>
     <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="foto" accept="image/*" required>
+        <input type="file" name="foto" required>
         <button type="submit">Subir</button>
     </form>
 
     <h3>Horas trabajadas</h3>
-    <?php if ($construccion): ?>
-        <p><b>Totales:</b> <?php echo (int)$construccion['HorasTotales']; ?> horas</p>
-        <p><b>Semanales:</b> <?php echo (int)$construccion['HorasSemanales']; ?> horas (máx. 168)</p>
 
-        <form method="POST" action="">
+    <?php if ($construccion): ?>
+        <p><b>Totales:</b> <?= (int)$construccion['HorasTotales'] ?> horas</p>
+        <p><b>Semanales:</b> <?= (int)$construccion['HorasSemanales'] ?> horas (máx. 168)</p>
+
+        <form method="POST">
             <label for="hor">Ingresar horas trabajadas</label>
             <input type="number" id="hor" name="hor" min="0" max="24" required>
-            <button type="submit" id="button">Guardar</button>
+            <button type="submit">Guardar</button>
         </form>
+
     <?php else: ?>
-        <p style="color:red;">❌ No tienes registros en la construcción.</p>
+        <p style="color:red;">❌ No tienes registros en construcción.</p>
     <?php endif; ?>
 
     <?php if (!empty($error)) echo "<p style='color:red;'>$error</p>"; ?>
 </div>
+
 </body>
 </html>

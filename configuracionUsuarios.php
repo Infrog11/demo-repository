@@ -1,153 +1,220 @@
 <?php
-$configFile = "config.json";
-$config = [
-    "font_size" => 3,
-    "theme" => "light",
-    "language" => "es",
-    "icons" => "icons"
-];
-if (file_exists($configFile)) {
-    $config = json_decode(file_get_contents($configFile), true);
+session_start();
+
+if (!isset($_SESSION["Cedula"])) {
+    header("Location: login.php");
+    exit();
 }
 
-// aplicar configuración
-$fontSize = intval($config["font_size"]) * 4 + 8; // escala 1–5 → px
-$themeBg = ($config["theme"] == "dark") ? "#222" : "#fff";
+$cedula = $_SESSION["Cedula"];
+
+// Conexión a la base de datos
+$mysqli = new mysqli("localhost", "root", "equipoinfrog", "PROYECT_DataBase_MyCoop6");
+
+if ($mysqli->connect_errno) {
+    die("Error al conectar a la base de datos: " . $mysqli->connect_error);
+}
+
+// Verificar si ya existe configuración para este usuario
+$configResult = $mysqli->query("SELECT * FROM ConfiguracionUsuario WHERE Cedula = $cedula");
+
+if ($configResult->num_rows > 0) {
+    $config = $configResult->fetch_assoc();
+} else {
+    // Si no existe, crearla con valores por defecto
+    $mysqli->query("INSERT INTO ConfiguracionUsuario (Cedula) VALUES ($cedula)");
+
+    $config = [
+        "font_size" => 3,
+        "theme" => "light",
+        "icons" => "icons"
+    ];
+}
+
+// Guardar cambios
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $font_size = intval($_POST["font_size"]);
+    $theme = $mysqli->real_escape_string($_POST["theme"]);
+    $icons = $mysqli->real_escape_string($_POST["icons"]);
+
+    $update = $mysqli->query("
+        UPDATE ConfiguracionUsuario
+        SET font_size = $font_size,
+            theme = '$theme',
+            icons = '$icons'
+        WHERE Cedula = $cedula
+    ");
+
+    if ($update) {
+        $mensajeGuardado = "<div class='alert success'>Configuración guardada correctamente.</div>";
+        $config["font_size"] = $font_size;
+        $config["theme"] = $theme;
+        $config["icons"] = $icons;
+    } else {
+        $mensajeGuardado = "<div class='alert error'>Error al guardar configuración.</div>";
+    }
+}
+
+// Aplicar configuración visual
+$fontSize = intval($config["font_size"]) * 4 + 8;
+$themeBg = ($config["theme"] == "dark") ? "#1a1f36" : "#f4f6f9";
 $themeColor = ($config["theme"] == "dark") ? "#eee" : "#000";
+$icons = $config["icons"];   // ← AGREGAR ESTA LÍNEA
 ?>
-<html>
-<head>
-<style>
-    body {
-        font-size: <?= $fontSize ?>px;
-        background: <?= $themeBg ?>;
-        color: <?= $themeColor ?>;
-        font-family: Arial, sans-serif;
-    }
-    table {
-        background: <?= ($config["theme"] == "dark") ? "#333" : "#f9f9f9" ?>;
-        color: <?= $themeColor ?>;
-    }
-</style>
-</head>
-<body>
-    
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MyCoop</title>
-    <link rel="stylesheet" href="Style.css" />
+<meta charset="UTF-8">
+<title>Configuración</title>
+<style>
+    body {
+        background-color: <?= $themeBg ?>;
+        color: <?= $themeColor ?>;
+        font-size: <?= $fontSize ?>px;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: auto;
+        background: rgba(255,255,255,0.1);
+        padding: 20px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 0 12px #0003;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    select, input[type="number"] {
+        width: 100%;
+        padding: 8px;
+        margin: 8px 0 20px;
+        border-radius: 5px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        font-size: 18px;
+        background: #4a8ef0;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d6fe0;
+    }
+
+    .alert {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .success {
+        background: #4caf50;
+        color: white;
+    }
+
+    .error {
+        background: #e53935;
+        color: white;
+    }
+    nav {
+    background-color: <?= $themeBg ?>;
+    padding: 10px 0;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#Navegador {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#Navegador a img {
+    transition: transform 0.3s, filter 0.3s;
+    border-radius: 50%;
+    padding: 5px;
+    background: #fff;
+}
+
+#Navegador a img:hover {
+    transform: scale(1.15);
+    filter: brightness(1.1);
+}
+</style>
 </head>
 <nav>
     <div id="Navegador">
-        <a href="usuarioUsuario.php"><img src="iconoUsuario.png" height="70px"></a>
-        <a href="fechasUsuarios.php"><img src="iconoCalendario.png" height="70px"></a>
-        <a href="comunicacionUsuarios.php"><img src="iconoComunicacion.png" height="70px"></a>
-        <a href="archivoUsuarios.php"><img src="iconoDocumentos.png" height="70px"></a>
-        <a href="configuracionUsuarios.php"><img src="iconoConfiguracion.png" height="70px"></a>
-        <a href="notificacionesUsuario.php"><img src="iconoNotificacion.png" height="70px"></a>
-        <a href="TesoreroUsuario.php"><img src="Tesorero.png" height="70px"></a>
+
+        <?php if ($config["icons"] === "icons"): ?>
+            <a href="usuarioUsuario.php"><img src="iconoUsuario.png"heigth="70px"></a>
+            <a href="fechasUsuarios.php"><img src="iconoCalendario.png"height="70px"></a>
+            <a href="comunicacionUsuarios.php"><img src="iconoComunicacion.png"height="70px"></a>
+            <a href="archivoUsuarios.php"><img src="iconoDocumentos.png"height="70px"></a>
+            <a href="foroUsuarios.php"><img src="redes-sociales.png"height="70px"></a>
+            <a href="inicioUsuario.php"><img src="anuncios.png" height="70px"></a>
+            <a href="notificacionesUsuario.php"><img src="iconoNotificacion.png"height="70px"></a>
+            <a href="TesoreroUsuario.php"><img src="Tesorero.png"height="70px"></a>
+
+        <?php else: ?>
+            <a href="usuarioUsuario.php">Usuario</a>
+            <a href="fechasUsuarios.php">Calendario</a>
+            <a href="comunicacionUsuarios.php">Comunicación</a>
+            <a href="archivoUsuarios.php">Archivos</a>
+            <a href="foroUsuarios.php">Foro</a>
+            <a href="inicioUsuario.php">Novedades</a>
+            <a href="notificacionesUsuario.php">Notificaciones</a>
+            <a href="TesoreroUsuario.php">Tesorería</a>
+        <?php endif; ?>
+
     </div>
 </nav>
 <body>
-    <div id="Logo">
-    <img src="logoMyCoop.png" height="200px">
-    </div>
-    <!--<label for="direccion">Tema de la pagina</label>
-        <select id="tema" name="tema">
-        <option value="claro">Modo claro</option>
-        <option value="oscuro">Modo Oscuro</option>
-    </select>
-    <label for="letra">Tamaño de la letra</label>
-        <select id="letra" name="letra">
-        <option value="uno">1</option>
-        <option value="dos">2</option>
-        <option value="tres">3</option>
-        <option value="cuatro">4</option>
-        <option value="cinco">5</option>
-    </select>
-    <label for="daltonismo">Activar el modo daltonismo</label>
-        <select id="dalt" name="dalt">
-        <option value="No">No</option>
-        <option value="Si">Si</option>
-    </select>
-    <label for="Idioma">Idioma</label>
-        <select id="idioma" name="idioma">
-        <option value="esp">Español</option>
-        <option value="ing">Ingles</option>
-    </select>
-     <label for="simp">Simplificar pagina</label>
-        <select id="simp" name="simp">
-        <option value="NoSimp">No</option>
-        <option value="SiSimp">Si</option>
-    </select> -->
 
-    <?php
-$configFile = "config.json";
+<div class="container">
+    <h2>Configuración Personal</h2>
 
-// cargar configuración actual o valores por defecto
-$config = [
-    "font_size" => 3,
-    "theme" => "light",
-    "language" => "es",
-    "icons" => "icons" // "icons" o "words"
-];
+    <?= isset($mensajeGuardado) ? $mensajeGuardado : '' ?>
 
-if (file_exists($configFile)) {
-    $config = json_decode(file_get_contents($configFile), true);
-}
+    <form method="POST">
 
-// guardar cambios
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $config["font_size"] = $_POST["font_size"];
-    $config["theme"] = $_POST["theme"];
-    $config["language"] = $_POST["language"];
-    $config["icons"] = $_POST["icons"];
+        <!-- Tamaño de fuente -->
+        <label>Tamaño de fuente:</label>
+        <input type="number" name="font_size" min="1" max="10" value="<?= $config["font_size"] ?>">
 
-    file_put_contents($configFile, json_encode($config, JSON_PRETTY_PRINT));
-    echo "<p style='color:green;'>Configuración guardada</p>";
-}
-?>
+        <!-- Tema -->
+        <label>Tema:</label>
+        <select name="theme">
+            <option value="light" <?= $config["theme"] == "light" ? "selected" : "" ?>>Claro</option>
+            <option value="dark" <?= $config["theme"] == "dark" ? "selected" : "" ?>>Oscuro</option>
+        </select>
 
-<h2>Configuración</h2>
-<form method="post">
-    <label>Tamaño de letra:</label>
-    <select name="font_size">
-        <?php
-        for ($i = 1; $i <= 5; $i++) {
-            $sel = ($config["font_size"] == $i) ? "selected" : "";
-            echo "<option value='$i' $sel>$i</option>";
-        }
-        ?>
-    </select>
-    <br><br>
+        <!-- Iconos -->
+        <label>Modo de iconos:</label>
+        <select name="icons">
+            <option value="icons" <?= $config["icons"] == "icons" ? "selected" : "" ?>>Iconos</option>
+            <option value="words" <?= $config["icons"] == "words" ? "selected" : "" ?>>Palabras</option>
+        </select>
 
-    <label>Tema:</label>
-    <select name="theme">
-        <option value="light" <?= $config["theme"] == "light" ? "selected" : "" ?>>Claro</option>
-        <option value="dark" <?= $config["theme"] == "dark" ? "selected" : "" ?>>Oscuro</option>
-    </select>
-    <br><br>
-
-    <label>Idioma:</label>
-    <select name="language">
-        <option value="es" <?= $config["language"] == "es" ? "selected" : "" ?>>Español</option>
-        <option value="en" <?= $config["language"] == "en" ? "selected" : "" ?>>English</option>
-    </select>
-    <br><br>
-
-    <label>Mostrar:</label>
-    <select name="icons">
-        <option value="icons" <?= $config["icons"] == "icons" ? "selected" : "" ?>>Iconos</option>
-        <option value="words" <?= $config["icons"] == "words" ? "selected" : "" ?>>Palabras</option>
-    </select>
-    <br><br>
-
-    <button type="submit">Guardar</button>
-</form>
-
-
+        <button type="submit">Guardar cambios</button>
+    </form>
+</div>
 </body>
 </html>

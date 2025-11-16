@@ -1,5 +1,7 @@
 <?php
-
+// =============================
+//  Conexión DB
+// =============================
 $host = "localhost";   
 $user = "root";        
 $pass = "equipoinfrog";          
@@ -11,105 +13,232 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
+// =============================
+//  Obtener configuración del usuario
+// =============================
+session_start();
 
+if (!isset($_SESSION["Cedula"])) {
+    die("Acceso denegado. Por favor, inicia sesión.");
+}
+
+$ced = $_SESSION["Cedula"];
+
+$stmt = $conn->prepare("
+    SELECT font_size, theme, icons
+    FROM ConfiguracionUsuario
+    WHERE Cedula = ?
+");
+$stmt->bind_param("i", $ced);
+$stmt->execute();
+$res = $stmt->get_result();
+
+if ($res->num_rows > 0) {
+    $cfg = $res->fetch_assoc();
+
+    // Corrección: evitar valores inválidos
+    if (!isset($cfg["icons"]) || ($cfg["icons"] != "icons" && $cfg["icons"] != "words")) {
+        $cfg["icons"] = "icons";
+    }
+
+} else {
+    $cfg = [
+        "font_size" => 3,
+        "theme"     => "light",
+        "icons"     => "icons"
+    ];
+}
+
+// Aplicar configuración
+$fontSize = intval($cfg["font_size"]) * 4 + 12;
+$theme = $cfg["theme"];
+$icons = $cfg["icons"];
+
+// Carpeta de iconos (si luego quieres cambiar iconos por tema)
+$iconFolder = ($icons === "words") ? "icons_white" : "icons";
+
+// Colores según tema
+if ($theme === "dark") {
+    $bodyBg = "#1a1f36";
+    $bodyColor = "#ffffff";
+    $tableBg = "#2c3e50";
+    $tableText = "#ffffff";
+    $tableAlt = "#243447";
+    $hoverRow = "#34495e";
+    $navBg = "#0f1626";
+} else {
+    $bodyBg = "#f5f7fa";
+    $bodyColor = "#2c3e50";
+    $tableBg = "#ffffff";
+    $tableText = "#2c3e50";
+    $tableAlt = "#f9f9f9";
+    $hoverRow = "#eaf2f8";
+    $navBg = "#2c3e50";
+}
+
+// =============================
+//  Saldo del fondo
+// =============================
 $result = $conn->query("SELECT SUM(Monto) AS saldo FROM FondoMonetario");
 $row = $result->fetch_assoc();
-$saldo = $row['saldo'] ?? 0;
-?>
+$saldo = $row["saldo"] ?? 0;
 
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Movimientos del Fondo</title>
-</head>
+<meta charset="UTF-8">
+<title>Movimientos del Fondo</title>
+
 <style>
     body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    margin: 20px;
-    background: #f5f7fa;
-    color: #2c3e50;
-}
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 20px;
+        background: <?= $bodyBg ?>;
+        color: <?= $bodyColor ?>;
+        font-size: <?= $fontSize ?>px;
+    }
 
-h2, h3 {
-    color: #34495e;
-    margin-bottom: 10px;
-}
+    table {
+        border-collapse: collapse;
+        width: 90%;
+        background: <?= $tableBg ?>;
+        color: <?= $tableText ?>;
+        margin-top: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
+    }
 
-h3 {
-    font-weight: normal;
-}
+    th, td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
 
-table {
-    border-collapse: collapse;
-    width: 90%;
-    margin-top: 15px;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0px 3px 6px rgba(0,0,0,0.1);
-}
+    th {
+        background: <?= $navBg ?>;
+        color: white;
+        text-transform: uppercase;
+    }
 
-th, td {
-    padding: 12px 15px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-}
+    tr:nth-child(even) {
+        background: <?= $tableAlt ?>;
+    }
 
-th {
-    background: #2c3e50;
-    color: #fff;
-    font-size: 14px;
-    text-transform: uppercase;
-}
+    tr:hover {
+        background: <?= $hoverRow ?>;
+    }
 
-tr:nth-child(even) {
-    background: #f9f9f9;
-}
+    td:nth-child(2) {
+        font-weight: bold;
+        color: #27ae60;
+    }
 
-tr:hover {
-    background: #eaf2f8;
-}
+    /* NAV FIXEADO + REDUCIDO */
+    nav {
+        background: <?= $navBg ?>;
+        padding: 6px;
+        width: 100%;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        margin-bottom: 20px;
+    }
 
-td:nth-child(2) { 
-    font-weight: bold;
-    color: #27ae60;
-}
+    #Navegador {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap; /* evita desbordes */
+        gap: 12px;
+    }
 
-h3:nth-of-type(1) {
-    background: #2ecc71;
-    color: white;
-    display: inline-block;
-    padding: 8px 14px;
-    border-radius: 6px;
-    margin-top: 0;
-}
+    #Navegador img {
+        height: 45px; /* iconos reducidos */
+        padding: 3px;
+        border-radius: 50%;
+        background: white;
+        transition: transform 0.2s;
+    }
 
+    #Navegador img:hover {
+        transform: scale(1.10);
+    }
+
+    #Navegador a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: <?= $fontSize ?>px;
+    }
 </style>
+</head>
+
+<nav>
+    <div id="Navegador">
+
+        <?php if ($icons === "icons"): ?>
+            <!-- MODO ICONOS -->
+            <a href="aprobarUsuarios.php"><img src="iconoAdministracion.png"></a>
+            <a href="usuario.php"><img src="iconoUsuario.png"></a>
+            <a href="fechas.php"><img src="iconoCalendario.png"></a>
+            <a href="comunicacion.php"><img src="iconoComunicacion.png"></a>
+            <a href="archivo.php"><img src="iconoDocumentos.png"></a>
+            <a href="Construccion.php"><img src="iconoConstruccion.png"></a>
+            <a href="foro.php"><img src="redes-sociales.png"></a>
+            <a href="configuracion.php"><img src="iconoConfiguracion.png"></a>
+            <a href="notificaciones.php"><img src="iconoNotificacion.png"></a>
+            <a href="TesoreroAdmin.php"><img src="Tesorero.png"></a>
+
+        <?php else: ?>
+            <!-- MODO PALABRAS -->
+            <a href="aprobarUsuarios.php">Administración</a>
+            <a href="usuario.php">Usuario</a>
+            <a href="fechas.php">Calendario</a>
+            <a href="comunicacion.php">Comunicación</a>
+            <a href="archivo.php">Archivos</a>
+            <a href="Construccion.php">Construcción</a>
+            <a href="foro.php">Foro</a>
+            <a href="configuracion.php">Configuración</a>
+            <a href="notificaciones.php">Notificaciones</a>
+            <a href="TesoreroAdmin.php">Tesorería</a>
+        <?php endif; ?>
+
+    </div>
+</nav>
+
 <body>
-    <h2>Consulta de Movimientos</h2>
 
-    <h3>Saldo Actual: $<?php echo number_format($saldo, 2); ?></h3>
+<h2>Consulta de Movimientos</h2>
 
-    <h3>Historial de movimientos</h3>
-    <table border="1" cellpadding="5">
+<h3>Saldo Actual: $<?= number_format($saldo, 2) ?></h3>
+
+<h3>Historial de movimientos</h3>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Monto</th>
+        <th>Descripción</th>
+        <th>Cédula</th>
+    </tr>
+
+    <?php
+    $movs = $conn->query("SELECT * FROM FondoMonetario ORDER BY IdFondo DESC");
+
+    while ($fila = $movs->fetch_assoc()) {
+        echo "
         <tr>
-            <th>ID</th>
-            <th>Monto</th>
-            <th>Descripción</th>
-            <th>Cédula</th>
-        </tr>
-        <?php
-        $movs = $conn->query("SELECT * FROM FondoMonetario ORDER BY IdFondo DESC");
-        while ($fila = $movs->fetch_assoc()) {
-            echo "<tr>
-                    <td>{$fila['IdFondo']}</td>
-                    <td>{$fila['Monto']}</td>
-                    <td>{$fila['DescripcionFondo']}</td>
-                    <td>{$fila['Cedula_Tesorero']}</td>
-                </tr>";
-        }
-        ?>
-    </table>
+            <td>{$fila['IdFondo']}</td>
+            <td>{$fila['Monto']}</td>
+            <td>{$fila['DescripcionFondo']}</td>
+            <td>{$fila['Cedula_Tesorero']}</td>
+        </tr>";
+    }
+    ?>
+</table>
+
 </body>
 </html>

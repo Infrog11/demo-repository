@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-
 if (!isset($_SESSION["Rol"]) || $_SESSION["Rol"] !== "administrador") {
     die("Acceso denegado. Solo administradores pueden entrar aquí.");
 }
 
+$cedula = $_SESSION["Cedula"];
 
 $host = "localhost";
 $user = "root";
@@ -17,6 +17,33 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
+/* ================================
+   CARGAR CONFIGURACIÓN DEL USUARIO
+   ================================ */
+$configResult = $conn->query("SELECT * FROM ConfiguracionUsuario WHERE Cedula = $cedula");
+
+if ($configResult->num_rows > 0) {
+    $config = $configResult->fetch_assoc();
+} else {
+    // Valores por defecto si no existe configuración
+    $config = [
+        "font_size" => 3,
+        "theme" => "light",
+        "icons" => "icons"
+    ];
+}
+
+// Aplicar configuración
+$fontSize = intval($config["font_size"]) * 4 + 8;
+$themeBg = ($config["theme"] == "dark") ? "#1a1f36" : "#f4f6f9";
+$themeColor = ($config["theme"] == "dark") ? "#eee" : "#000";
+$icons = $config["icons"];
+$linkColor = ($config["theme"] == "dark") ? "#fff" : "#000";
+
+
+/* ================================
+    LÓGICA DE APROBACIÓN Y ROLES
+   ================================ */
 
 if (isset($_GET["aprobar"])) {
     $cedulaAprobar = intval($_GET["aprobar"]);
@@ -27,13 +54,13 @@ if (isset($_GET["aprobar"])) {
     echo "<p style='color:green;'>Usuario con cédula $cedulaAprobar aprobado ✅</p>";
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["cambiarRol"])) {
     $cedula = intval($_POST["cedula"]);
     $nuevoRol = $_POST["rol"];
 
     $stmt = $conn->prepare("UPDATE Persona SET Rol = ? WHERE Cedula = ?");
     $stmt->bind_param("si", $nuevoRol, $cedula);
+
     if ($stmt->execute()) {
         echo "<p style='color:blue;'>Rol actualizado para usuario con cédula $cedula ➝ $nuevoRol</p>";
     } else {
@@ -42,129 +69,119 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["cambiarRol"])) {
     $stmt->close();
 }
 
-
 $resultPendientes = $conn->query("SELECT Cedula, Nombre, Apellido, Comunicacion FROM Persona WHERE Aceptado = 0");
-
-
 $resultAprobados = $conn->query("SELECT Cedula, Nombre, Apellido, Comunicacion, Rol FROM Persona WHERE Aceptado = 1");
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Panel de Aprobación - MyCoop</title>
-    <link rel="stylesheet" href="Style.css">
 </head>
+
 <style>
     body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: #f4f6f9;
-    color: #333;
-}
+        background: <?= $themeBg ?>;
+        color: <?= $themeColor ?>;
+        font-size: <?= $fontSize ?>px;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+    }
 
-h1 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 30px;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
-}
+    h1, h2 {
+        color: <?= $themeColor ?>;
+    }
 
-h2 {
-    color: #34495e;
-    margin-top: 40px;
-    border-left: 6px solid #3498db;
-    padding-left: 10px;
-}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background: <?= ($config["theme"] == "dark") ? "#2a314a" : "#fff" ?>;
+        color: <?= $themeColor ?>;
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
+    th {
+        background: <?= ($config["theme"] == "dark") ? "#111726" : "#2c3e50" ?>;
+        color: #fff;
+    }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0px 6px 15px rgba(0,0,0,0.1);
-}
+    tr:hover {
+        background: <?= ($config["theme"] == "dark") ? "#3a4569" : "#f0f8ff" ?>;
+    }
 
-th, td {
-    padding: 12px 15px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-}
+    a {
+        color: <?= $linkColor ?>;
+        text-decoration: none;
+        font-weight: bold;
+    }
 
-th {
-    background: #2c3e50;
-    color: #fff;
-    text-transform: uppercase;
-    font-size: 14px;
-}
+    nav {
+        background: <?= ($config["theme"] == "dark") ? "#111726" : "#2c3e50" ?>;
+        padding: 10px 0;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
 
-tr:hover {
-    background: #f0f8ff;
-}
+    #Navegador {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
 
+    #Navegador a img {
+        transition: transform 0.3s;
+        border-radius: 50%;
+        padding: 5px;
+        background: #fff;
+    }
 
-a {
-    text-decoration: none;
-    font-weight: bold;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: 0.3s;
-}
+    #Navegador a:hover img {
+        transform: scale(1.15);
+    }
 
-a[href*="aprobar"] {
-    background: #27ae60;
-    color: #fff !important;
-}
-
-a[href*="aprobar"]:hover {
-    background: #1e8449;
-    transform: scale(1.05);
-}
-
-
-select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #bbb;
-    font-size: 14px;
-    outline: none;
-    cursor: pointer;
-}
-
-button {
-    background: #3498db;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-button:hover {
-    background: #2c3e50;
-    transform: scale(1.05);
-}
-
-
-p {
-    font-style: italic;
-    color: #555;
-    margin-top: 10px;
-}
 </style>
+
+<nav>
+    <div id="Navegador">
+        <?php if ($icons == "icons"): ?>
+            <a href="inicio.php"><img src="anuncios.png" height="70px"></a>
+            <a href="usuario.php"><img src="iconoUsuario.png" height="70px"></a>
+            <a href="fechas.php"><img src="iconoCalendario.png" height="70px"></a>
+            <a href="comunicacion.php"><img src="iconoComunicacion.png" height="70px"></a>
+            <a href="archivo.php"><img src="iconoDocumentos.png" height="70px"></a>
+            <a href="Construccion.php"><img src="iconoConstruccion.png" height="70px"></a>
+            <a href="foro.php"><img src="redes-sociales.png" height="70px"></a>
+            <a href="configuracion.php"><img src="iconoConfiguracion.png" height="70px"></a>
+            <a href="notificaciones.php"><img src="iconoNotificacion.png" height="70px"></a>
+            <a href="TesoreroAdmin.php"><img src="Tesorero.png" height="70px"></a>
+        <?php else: ?>
+            <a href="inicio.php">Novedades</a>
+            <a href="usuario.php">Usuario</a>
+            <a href="fechas.php">Calendario</a>
+            <a href="comunicacion.php">Comunicación</a>
+            <a href="archivo.php">Archivos</a>
+            <a href="Construccion.php">Construcción</a>
+            <a href="foro.php">Foro</a>
+            <a href="configuracion.php">Configuración</a>
+            <a href="notificaciones.php">Notificaciones</a>
+            <a href="TesoreroAdmin.php">Tesorería</a>
+        <?php endif; ?>
+    </div>
+</nav>
+
 <body>
+
     <h1>Panel de Administración</h1>
 
     <h2>Usuarios Pendientes</h2>
     <?php if ($resultPendientes->num_rows > 0): ?>
-        <table border="1" cellpadding="8">
+        <table>
             <tr>
                 <th>Cédula</th>
                 <th>Nombre</th>
@@ -178,10 +195,7 @@ p {
                     <td><?= $row["Nombre"] ?></td>
                     <td><?= $row["Apellido"] ?></td>
                     <td><?= $row["Comunicacion"] ?></td>
-                    <td>
-                        <a href="aprobarUsuarios.php?aprobar=<?= $row["Cedula"] ?>" 
-                        style="color: green; font-weight: bold;">✔ Aprobar</a>
-                    </td>
+                    <td><a href="aprobarUsuarios.php?aprobar=<?= $row["Cedula"] ?>">✔ Aprobar</a></td>
                 </tr>
             <?php endwhile; ?>
         </table>
@@ -191,7 +205,7 @@ p {
 
     <h2>Usuarios Aprobados</h2>
     <?php if ($resultAprobados->num_rows > 0): ?>
-        <table border="1" cellpadding="8">
+        <table>
             <tr>
                 <th>Cédula</th>
                 <th>Nombre</th>
@@ -208,7 +222,7 @@ p {
                     <td><?= $row["Comunicacion"] ?></td>
                     <td><?= $row["Rol"] ?></td>
                     <td>
-                        <form method="POST" style="display:inline;">
+                        <form method="POST">
                             <input type="hidden" name="cedula" value="<?= $row["Cedula"] ?>">
                             <select name="rol" required>
                                 <option value="usuario" <?= $row["Rol"] === "usuario" ? "selected" : "" ?>>Usuario</option>
@@ -224,5 +238,6 @@ p {
     <?php else: ?>
         <p>No hay usuarios aprobados todavía.</p>
     <?php endif; ?>
+
 </body>
 </html>
