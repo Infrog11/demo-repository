@@ -15,7 +15,6 @@ if (!isset($_SESSION['Cedula'])) {
 
 $ced = $_SESSION['Cedula'];
 
-// --- OBTENER DATOS DEL USUARIO ---
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, edad AS Edad,
            COALESCE(Pronombres, '') AS Pronombres,
@@ -28,7 +27,6 @@ $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 $nombreCompleto = $usuario['Nombre'] . ' ' . $usuario['Apellido'];
 
-// --- OBTENER CONFIGURACIÓN DEL USUARIO ---
 $stmtCfg = $conn->prepare("
     SELECT font_size, theme, icons
     FROM configuracionUsuario
@@ -42,13 +40,11 @@ $fontSize = isset($config["font_size"]) ? intval($config["font_size"]) : 3;
 $theme = $config["theme"] ?? "light";
 $iconsMode = $config["icons"] ?? "icons";
 
-// --- BORRAR HILO ---
 if (isset($_POST['borrar'])) {
     $id = intval($_POST['idforo']);
     $conn->query("DELETE FROM Foros WHERE IdForo = $id");
 }
 
-// --- CREAR HILO ---
 if (isset($_POST['crear'])) {
     $titulo = $_POST['titulo'];
     $autor = $nombreCompleto;
@@ -60,7 +56,6 @@ if (isset($_POST['crear'])) {
     }
 }
 
-// --- LISTAR HILOS ---
 $foros = $conn->query("SELECT * FROM Foros ORDER BY Fecha DESC");
 ?>
 
@@ -157,7 +152,7 @@ button.borrar:hover {
     background-color: #c0392b;
 }
 
-/* NAV */
+
 .navbar {
     background: var(--nav-bg);
     padding: 8px 0;
@@ -186,7 +181,7 @@ button.borrar:hover {
     transform: scale(1.1);
 }
 
-/* Si iconsMode = text */
+
 #Navegador a.text-link {
     color: white;
     background: var(--icon-bg);

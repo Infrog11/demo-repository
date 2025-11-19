@@ -11,7 +11,7 @@ $cedula = $_SESSION['Cedula'];
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- Configuración del usuario ---
+
 $stmtCfg = $conn->prepare("SELECT font_size, theme, icons FROM ConfiguracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $cedula);
 $stmtCfg->execute();
@@ -25,7 +25,7 @@ $fontSize = intval($cfg["font_size"]) * 4 + 12;
 $theme = $cfg["theme"];
 $icons = $cfg["icons"];
 
-// --- Tema ---
+
 if ($theme === "dark") {
     $bodyBg = "#1a1f36";
     $textColor = "#ffffff";
@@ -48,7 +48,7 @@ if ($theme === "dark") {
     $btnHover = "#e67e22";
 }
 
-// --- Guardar nuevo mensaje ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['mensaje'])) {
     $mensaje = trim($_POST['mensaje']);
     if ($mensaje !== "") {
@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['mensaje'])) {
     }
 }
 
-// --- Obtener mensajes ---
+
 $stmt = $conn->prepare("SELECT Mensaje, Respuesta, Archivado FROM Mensajes WHERE Cedula = ? ORDER BY idMensaje DESC");
 $stmt->bind_param("i", $cedula);
 $stmt->execute();

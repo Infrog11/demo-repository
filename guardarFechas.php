@@ -1,9 +1,7 @@
 <?php
 session_start();
 
-// -------------------------------------------------------
-// 1. Verificar sesión
-// -------------------------------------------------------
+
 if (!isset($_SESSION["Cedula"])) {
     header("Location: login.php");
     exit();
@@ -11,9 +9,6 @@ if (!isset($_SESSION["Cedula"])) {
 
 $cedula = $_SESSION["Cedula"];
 
-// -------------------------------------------------------
-// 2. Conexión BD
-// -------------------------------------------------------
 $host = "localhost";
 $user = "root";
 $pass = "equipoinfrog";
@@ -25,9 +20,7 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// -------------------------------------------------------
-// 3. Obtener configuración del usuario
-// -------------------------------------------------------
+
 $sql = "SELECT font_size, theme FROM ConfiguracionUsuario WHERE Cedula = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $cedula);
@@ -46,9 +39,7 @@ if ($result->num_rows > 0) {
 $stmt->close();
 $realFontSize = $font_size * 4;
 
-// -------------------------------------------------------
-// 4. Colores por tema
-// -------------------------------------------------------
+
 if ($theme === "dark") {
     $bodyBg        = "#0d1117";
     $boxBg         = "#1a1f36";
@@ -186,11 +177,7 @@ if ($theme === "dark") {
     <a href="fechas.php">⬅ Volver</a>
 
     <?php
-    // -------------------------------------------------------
-    // Guardar evento
-    // -------------------------------------------------------
-
-    // Nota: ya estamos conectados arriba
+   
     $conn->set_charset("utf8mb4");
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {

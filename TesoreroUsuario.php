@@ -1,7 +1,5 @@
 <?php
-// =============================
-//  Conexión DB
-// =============================
+
 $host = "localhost";   
 $user = "root";        
 $pass = "equipoinfrog";          
@@ -13,9 +11,6 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// =============================
-//  Obtener configuración del usuario
-// =============================
 session_start();
 
 if (!isset($_SESSION["Cedula"])) {
@@ -36,7 +31,7 @@ $res = $stmt->get_result();
 if ($res->num_rows > 0) {
     $cfg = $res->fetch_assoc();
 
-    // Corrección: evitar valores inválidos
+ 
     if (!isset($cfg["icons"]) || ($cfg["icons"] != "icons" && $cfg["icons"] != "words")) {
         $cfg["icons"] = "icons";
     }
@@ -49,15 +44,14 @@ if ($res->num_rows > 0) {
     ];
 }
 
-// Aplicar configuración
+
 $fontSize = intval($cfg["font_size"]) * 4 + 12;
 $theme = $cfg["theme"];
 $icons = $cfg["icons"];
 
-// Carpeta de iconos (si luego quieres cambiar iconos por tema)
 $iconFolder = ($icons === "words") ? "icons_white" : "icons";
 
-// Colores según tema
+
 if ($theme === "dark") {
     $bodyBg = "#1a1f36";
     $bodyColor = "#ffffff";
@@ -76,9 +70,6 @@ if ($theme === "dark") {
     $navBg = "#2c3e50";
 }
 
-// =============================
-//  Saldo del fondo
-// =============================
 $result = $conn->query("SELECT SUM(Monto) AS saldo FROM FondoMonetario");
 $row = $result->fetch_assoc();
 $saldo = $row["saldo"] ?? 0;
@@ -135,7 +126,7 @@ $saldo = $row["saldo"] ?? 0;
         color: #27ae60;
     }
 
-    /* NAV FIXEADO + REDUCIDO */
+   
     nav {
         background: <?= $navBg ?>;
         padding: 6px;
@@ -151,12 +142,12 @@ $saldo = $row["saldo"] ?? 0;
         display: flex;
         justify-content: center;
         align-items: center;
-        flex-wrap: wrap; /* evita desbordes */
+        flex-wrap: wrap; 
         gap: 12px;
     }
 
     #Navegador img {
-        height: 45px; /* iconos reducidos */
+        height: 45px; 
         padding: 3px;
         border-radius: 50%;
         background: white;

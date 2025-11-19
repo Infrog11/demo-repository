@@ -1,3 +1,5 @@
+
+
 <?php
 session_start();
 include "conexion.php";
@@ -9,17 +11,15 @@ if (!isset($_SESSION['Cedula'])) {
 
 $ced = (int) $_SESSION['Cedula'];
 
-// Obtener configuración del usuario
 $stmtCfg = $conn->prepare("SELECT font_size, theme, icons FROM configuracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $ced);
 $stmtCfg->execute();
 $config = $stmtCfg->get_result()->fetch_assoc();
 
 $fontSize = isset($config['font_size']) ? (int)$config['font_size'] : 3;
-$theme = isset($config['theme']) ? $config['theme'] : 'light'; // light / dark
-$iconsMode = isset($config['icons']) ? $config['icons'] : 'icons'; // icons / words
+$theme = isset($config['theme']) ? $config['theme'] : 'light'; 
+$iconsMode = isset($config['icons']) ? $config['icons'] : 'icons'; 
 
-// Fechas actuales
 if (isset($_GET['mes']) && isset($_GET['anio'])) {
     $mesActual = intval($_GET['mes']);
     $anioActual = intval($_GET['anio']);
@@ -42,7 +42,6 @@ if ($mesAnterior < 1) {
     $anioAnterior--;
 }
 
-// Obtener eventos
 $sql = "SELECT IdEvento, NombreEvento, FechaEvento, DescripcionEvento 
         FROM Eventos 
         WHERE MONTH(FechaEvento) = ? AND YEAR(FechaEvento) = ?";
@@ -57,7 +56,6 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Función para mostrar calendario
 function mostrarCalendario($mes, $anio, $eventos, $theme) {
     $primerDia = mktime(0,0,0,$mes,1,$anio);
     setlocale(LC_TIME, "es_ES.UTF-8");

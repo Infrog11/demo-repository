@@ -18,9 +18,7 @@ if ($conn->connect_error) {
 $ced = (int) $_SESSION['Cedula'];
 
 
-// =====================================================================
-// 1) DATOS DEL USUARIO
-// =====================================================================
+
 
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, edad AS Edad,
@@ -33,9 +31,6 @@ $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 
 
-// =====================================================================
-// 2) CONFIGURACIONES DEL USUARIO
-// =====================================================================
 
 $stmtConf = $conn->prepare("
     SELECT font_size, theme, icons 
@@ -46,15 +41,13 @@ $stmtConf->bind_param("i", $ced);
 $stmtConf->execute();
 $config = $stmtConf->get_result()->fetch_assoc();
 
-// Valores por defecto si no hay configuración guardada
+
 $fontSize = isset($config["font_size"]) ? (int)$config["font_size"] : 3;
-$theme = isset($config["theme"]) ? $config["theme"] : "light";      // light / dark
-$iconsMode = isset($config["icons"]) ? $config["icons"] : "icons";  // icons / words
+$theme = isset($config["theme"]) ? $config["theme"] : "light";     
+$iconsMode = isset($config["icons"]) ? $config["icons"] : "icons";  
 
 
-// =====================================================================
-// 3) DATOS DE CONSTRUCCIÓN
-// =====================================================================
+
 
 $stmt2 = $conn->prepare("
     SELECT IdUH, Etapa, HorasTotales, HorasSemanales, SemanaInicio
@@ -83,9 +76,7 @@ if ($construccion) {
 }
 
 
-// =====================================================================
-// 4) ACTUALIZAR PRONOMBRES
-// =====================================================================
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pronombres"])) {
     $pronombres = trim($_POST["pronombres"]);
@@ -97,9 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pronombres"])) {
 }
 
 
-// =====================================================================
-// 5) REGISTRO DE HORAS
-// =====================================================================
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
     $horasNew = (int) $_POST["hor"];
@@ -132,9 +121,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["hor"])) {
 }
 
 
-// =====================================================================
-// 6) SUBIR FOTO
-// =====================================================================
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["foto"])) {
     $dir = "uploads/";

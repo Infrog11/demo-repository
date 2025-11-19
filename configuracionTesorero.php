@@ -8,20 +8,19 @@ if (!isset($_SESSION["Cedula"])) {
 
 $cedula = $_SESSION["Cedula"];
 
-// Conexión a la base de datos
+
 $mysqli = new mysqli("localhost", "root", "equipoinfrog", "PROYECT_DataBase_MyCoop6");
 
 if ($mysqli->connect_errno) {
     die("Error al conectar a la base de datos: " . $mysqli->connect_error);
 }
 
-// Verificar si ya existe configuración para este usuario
 $configResult = $mysqli->query("SELECT * FROM ConfiguracionUsuario WHERE Cedula = $cedula");
 
 if ($configResult->num_rows > 0) {
     $config = $configResult->fetch_assoc();
 } else {
-    // Si no existe, crearla con valores por defecto
+
     $mysqli->query("INSERT INTO ConfiguracionUsuario (Cedula) VALUES ($cedula)");
 
     $config = [
@@ -31,7 +30,7 @@ if ($configResult->num_rows > 0) {
     ];
 }
 
-// Guardar cambios
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $font_size = intval($_POST["font_size"]);
@@ -56,11 +55,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Aplicar configuración visual
+
 $fontSize = intval($config["font_size"]) * 4 + 8;
 $themeBg = ($config["theme"] == "dark") ? "#1a1f36" : "#f4f6f9";
 $themeColor = ($config["theme"] == "dark") ? "#eee" : "#000";
-$icons = $config["icons"];   // ← AGREGAR ESTA LÍNEA
+$icons = $config["icons"];  
 ?>
 <!DOCTYPE html>
 <html lang="es">

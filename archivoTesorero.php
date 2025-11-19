@@ -8,22 +8,22 @@ if (!isset($_SESSION['Cedula'])) {
 
 $cedula = $_SESSION['Cedula'];
 
-// Conexión
+
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) {
     die("<p style='color:red;'>Error de conexión: " . $conn->connect_error . "</p>");
 }
 $conn->set_charset("utf8mb4");
 
-// Obtener configuración del usuario
+ Obtener configuración del usuario
 $stmtCfg = $conn->prepare("SELECT font_size, theme, icons FROM configuracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $cedula);
 $stmtCfg->execute();
 $config = $stmtCfg->get_result()->fetch_assoc();
 
 $fontSize = isset($config['font_size']) ? (int)$config['font_size'] : 3;
-$theme = isset($config['theme']) ? $config['theme'] : 'light'; // light / dark
-$iconsMode = isset($config['icons']) ? $config['icons'] : 'icons'; // icons / words
+$theme = isset($config['theme']) ? $config['theme'] : 'light'; 
+$iconsMode = isset($config['icons']) ? $config['icons'] : 'icons'; 
 ?>
 
 <!DOCTYPE html>

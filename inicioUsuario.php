@@ -8,25 +8,22 @@ if (!isset($_SESSION["Cedula"])) {
 
 $cedula = $_SESSION["Cedula"];
 
-// Conexión BD
+
 $mysqli = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_MyCoop6");
 if ($mysqli->connect_errno) {
     die("Error al conectar a la base de datos: " . $mysqli->connect_error);
 }
 
-// Cargar configuración del usuario
 $configRes = $mysqli->query("SELECT * FROM ConfiguracionUsuario WHERE Cedula = $cedula");
 
 if ($configRes->num_rows > 0) {
     $config = $configRes->fetch_assoc();
 
-    // Corrección: si icons es NULL, vacío o valor inválido → forzamos "icons"
     if (!isset($config["icons"]) || ($config["icons"] != "icons" && $config["icons"] != "words")) {
         $config["icons"] = "icons";
     }
 
 } else {
-    // Crear config si no existe
     $mysqli->query("INSERT INTO ConfiguracionUsuario (Cedula) VALUES ($cedula)");
     $config = [
         "font_size" => 3,
@@ -35,13 +32,12 @@ if ($configRes->num_rows > 0) {
     ];
 }
 
-// Aplicar configuración visual
 $fontSize = intval($config["font_size"]) * 4 + 8;
 
 $themeBg = ($config["theme"] == "dark") ? "#1a1f36" : "#f4f6f9";
 $themeColor = ($config["theme"] == "dark") ? "#eee" : "#333";
 
-$iconMode = $config["icons"]; // "icons" o "words"
+$iconMode = $config["icons"]; 
 
 ?>
 <!DOCTYPE html>
@@ -64,8 +60,6 @@ body {
     align-items: center;
     font-size: <?= $fontSize ?>px;
 }
-
-/* 🔥 NAV MUCHO MÁS PEQUEÑO */
 nav {
     background: #2c3e50;
     padding: 5px 0;
@@ -80,13 +74,13 @@ nav {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;   /* 🔥 evita desbordes */
+    flex-wrap: wrap;  
     gap: 10px;
     color: white;
 }
 
 #Navegador a img {
-    height: 45px;      /* 🔥 iconos más chicos */
+    height: 45px;     
     transition: transform 0.25s ease, filter 0.25s ease;
     border-radius: 50%;
     padding: 3px;
@@ -156,7 +150,7 @@ a:hover {
 <h1>Novedades</h1>
 
 <?php
-// Mostrar novedades
+
 $sql = "SELECT idNovedad, Novedad FROM Novedades ORDER BY idNovedad DESC";
 $result = $mysqli->query($sql);
 

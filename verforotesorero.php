@@ -9,7 +9,7 @@ $ced = $_SESSION['Cedula'];
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- Datos del usuario ---
+
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, COALESCE(Pronombres,'') AS Pronombres, COALESCE(FotoPerfil,'DefaultPerfile.png') AS FotoPerfil
     FROM Persona WHERE Cedula = ?
@@ -19,7 +19,7 @@ $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 $nombreCompleto = $usuario['Nombre'] . ' ' . $usuario['Apellido'];
 
-// --- Configuración de usuario ---
+
 $stmtCfg = $conn->prepare("SELECT font_size, theme, icons FROM ConfiguracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $ced);
 $stmtCfg->execute();
@@ -33,7 +33,7 @@ $fontSize = intval($cfg["font_size"]) * 4 + 12;
 $theme = $cfg["theme"];
 $icons = $cfg["icons"];
 
-// --- Tema ---
+
 if ($theme === "dark") {
     $bodyBg = "#1a1f36";
     $textColor = "#ffffff";
@@ -54,11 +54,10 @@ if ($theme === "dark") {
     $inputColor = "#000";
 }
 
-// --- Hilo y respuestas ---
+
 $idForo = intval($_GET['id'] ?? 0);
 $foro = $conn->query("SELECT * FROM Foros WHERE IdForo = $idForo")->fetch_assoc();
 
-// --- Guardar nueva respuesta ---
 if (isset($_POST['responder'])) {
     $mensaje = $_POST['mensaje'];
     if (!empty($mensaje)) {
@@ -68,7 +67,7 @@ if (isset($_POST['responder'])) {
     }
 }
 
-// --- Reportar respuesta ---
+
 if (isset($_POST['reportar_respuesta'])) {
     $idRespuesta = intval($_POST['id_respuesta']);
     $autorRespuesta = $_POST['autor_respuesta'];
@@ -78,7 +77,6 @@ if (isset($_POST['reportar_respuesta'])) {
     $stmtNotif->execute();
 }
 
-// --- Consultar respuestas ---
 $respuestas = $conn->query("SELECT * FROM Respuestas WHERE IdForo = $idForo ORDER BY Fecha ASC");
 ?>
 

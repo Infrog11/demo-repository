@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -9,23 +10,22 @@ if (!isset($_SESSION['Cedula'])) {
 $cedula = $_SESSION['Cedula'];
 $mensaje = "";
 
-// Conexión
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// Obtener configuración del usuario
+
 $stmtCfg = $conn->prepare("SELECT font_size, theme, icons FROM configuracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $cedula);
 $stmtCfg->execute();
 $config = $stmtCfg->get_result()->fetch_assoc();
 
 $fontSize = isset($config['font_size']) ? (int)$config['font_size'] : 3;
-$theme = isset($config['theme']) ? $config['theme'] : 'light'; // light / dark
-$iconsMode = isset($config['icons']) ? $config['icons'] : 'icons'; // icons / words
+$theme = isset($config['theme']) ? $config['theme'] : 'light'; 
+$iconsMode = isset($config['icons']) ? $config['icons'] : 'icons'; 
 
-// Enviar mensaje
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["msg"])) {
     $msg = trim($_POST["msg"]);
 

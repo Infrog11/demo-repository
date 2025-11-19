@@ -26,7 +26,8 @@ INSERT INTO Persona (Cedula, Nombre, Apellido, Direccion, Comunicacion, edad, co
 INSERT INTO Persona (Cedula, Nombre, Apellido, Direccion, Comunicacion, edad, contrasena, pronombres, Aceptado)VALUES (10000003, 'María', 'Rodríguez', 'Calle 789, Canelones', '093333333',  20,'ClaveMaria','Ella',true);
 INSERT INTO Persona (Cedula, Nombre, Apellido, Direccion, Comunicacion, edad, contrasena, pronombres, Aceptado)VALUES (10000004, 'Jorge', 'Fernández', 'Ruta 8, Las Piedras','jorge.fernandez@email.com',45, 'ClaveJorge','El', true);
 INSERT INTO Persona (Cedula, Nombre, Apellido, Direccion, Comunicacion, edad, contrasena, pronombres, Aceptado)VALUES (10000005, 'Lucía', 'Martínez', 'Calle Rivera 321, Montevideo', '095555555',  40, 'ClaveLucia','Ella',true);
-INSERT INTO Persona (Cedula, Nombre, Apellido, Direccion, Comunicacion, edad, contrasena, pronombres, Aceptado, Rol) VALUES(56991299, 'Max', 'Mendina','Juan Rosas 4525D','099550908', 20,'holamundo', 'ella', true, 'administrador');
+INSERT INTO Persona (Cedula, Nombre, Apellido, Direccion, Comunicacion, edad, contrasena, pronombres, Aceptado, Rol) VALUES(56991299, 'Max', 'Mendina','Juan Rosas 4525D','099550908', 20,'holamundo', 'ella', true, 'tesorero');
+INSERT INTO Persona (Cedula, Nombre, Apellido, Direccion, Comunicacion, edad, contrasena, pronombres, Aceptado, Rol) VALUES(56991475, 'Aileen', 'Argañaras','Juan Rosas 4525D','097473736',18 ,'equipoInfrog', 'ella', true, 'administrador');
 
 CREATE TABLE Administrador (
     Cedula INT(8)NOT NULL,

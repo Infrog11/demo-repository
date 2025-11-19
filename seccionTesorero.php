@@ -12,9 +12,6 @@ $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
 
-/* ----------------------------
-   OBTENER CONFIGURACIÓN USUARIO
------------------------------*/
 $stmtConfig = $conn->prepare("
     SELECT font_size, theme, icons 
     FROM ConfiguracionUsuario 
@@ -30,9 +27,7 @@ $theme     = $config['theme'] ?? "light";
 $icons     = $config['icons'] ?? "icons";
 
 
-/* ----------------------------
-   PROCESAR FORMULARIO
------------------------------*/
+
 if (isset($_POST['guardar'])) {
     $monto = $_POST['monto'];
     $descripcion = $_POST['descripcion'];
@@ -53,9 +48,6 @@ if (isset($_POST['guardar'])) {
 }
 
 
-/* ----------------------------
-   SALDO TOTAL
------------------------------*/
 $result = $conn->query("SELECT SUM(Monto) AS saldo FROM FondoMonetario");
 $row = $result->fetch_assoc();
 $saldo = $row['saldo'] ?? 0;
@@ -129,7 +121,7 @@ $saldo = $row['saldo'] ?? 0;
         color: white;
     }
 
-    /* Si el usuario usa modo WORDS */
+
     <?php if ($icons === "words"): ?>
         .icon-label { display: inline; }
         .icon-img { display: none; }

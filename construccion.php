@@ -8,11 +8,9 @@ if (!isset($_SESSION["Rol"]) || $_SESSION["Rol"] !== "administrador") {
 
 $cedula = $_SESSION['Cedula'] ?? 0;
 
-// Conexión
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// Obtener configuración del usuario
 $stmtCfg = $conn->prepare("SELECT font_size, theme, icons FROM configuracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $cedula);
 $stmtCfg->execute();
@@ -22,7 +20,6 @@ $fontSize = isset($config['font_size']) ? (int)$config['font_size'] : 3;
 $theme = isset($config['theme']) ? $config['theme'] : 'light';
 $iconsMode = isset($config['icons']) ? $config['icons'] : 'icons';
 
-// -------------------- ASIGNAR UH --------------------
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"])) {
     $tipoAccion = $_POST["tipo_accion"];
 
@@ -118,7 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tipo_accion"])) {
     }
 }
 
-// Consulta Construcción
 $sql = "
     SELECT c.Cedula, p.Nombre, p.Apellido, c.IdUH, c.Etapa, c.HorasTotales, c.HorasSemanales, c.SemanaInicio, c.DescripcionConst
     FROM Construye c
@@ -127,7 +123,6 @@ $sql = "
 ";
 $result = $conn->query($sql);
 
-// Lista de Unidades Habitacionales
 $sqlUH = "SELECT IdUH, Estado, Direccion FROM UnidadesHabitacionales ORDER BY IdUH ASC";
 $resultUH = $conn->query($sqlUH);
 ?>
@@ -222,7 +217,7 @@ td form { display:flex;
     align-items:center; 
     gap:6px; }
 
-/* NAV */
+
 nav {
     background: var(--nav-bg);
     padding: 5px 0;

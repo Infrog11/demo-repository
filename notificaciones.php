@@ -11,9 +11,7 @@ if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
 $ced = $_SESSION["Cedula"];
 
-// ================================
-//  CARGAR CONFIGURACIONES DEL USUARIO
-// ================================
+
 $config = [
     "font_size" => 16,
     "theme" => "light",
@@ -38,9 +36,7 @@ if ($res->num_rows > 0) {
 
 $stmt->close();
 
-// ================================
-//  RESPONDER MENSAJE
-// ================================
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['idMensaje'], $_POST['respuesta'])) {
     $idMensaje = intval($_POST['idMensaje']);
     $respuesta = trim($_POST['respuesta']);
@@ -51,9 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['idMensaje'], $_POST['
     $stmt->close();
 }
 
-// ================================
-//  APROBAR USUARIO
-// ================================
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['cedulaAprobar'])) {
     $cedula = intval($_POST['cedulaAprobar']);
     $stmt = $conn->prepare("UPDATE Persona SET Aceptado = 1 WHERE Cedula = ?");
@@ -62,9 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['cedulaAprobar'])) {
     $stmt->close();
 }
 
-// ================================
-//  MARCAR REPORTE DE FORO COMO REVISADO
-// ================================
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['idReporteRevisado'])) {
     $idRep = intval($_POST['idReporteRevisado']);
     $stmt = $conn->prepare("UPDATE ReportesForo SET Estado = 'Revisado' WHERE idReporte = ?");
@@ -73,9 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['idReporteRevisado']))
     $stmt->close();
 }
 
-// ================================
-//  CONSULTAS
-// ================================
+
 $result = $conn->query("
     SELECT m.idMensaje, m.Mensaje, p.Nombre, p.Apellido
     FROM Mensajes m

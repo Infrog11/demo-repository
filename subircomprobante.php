@@ -6,13 +6,11 @@ if (!isset($_SESSION["Cedula"])) {
 
 $cedula = $_SESSION["Cedula"];
 
-// Conexión a la base de datos
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// Obtener configuración del usuario
 $stmt = $conn->prepare("SELECT font_size, theme FROM ConfiguracionUsuario WHERE Cedula = ?");
 $stmt->bind_param("i", $cedula);
 $stmt->execute();
@@ -27,7 +25,6 @@ if ($res->num_rows > 0) {
     ];
 }
 
-// Aplicar configuración
 $fontSize = intval($cfg["font_size"]) * 4 + 12;
 $theme = $cfg["theme"];
 

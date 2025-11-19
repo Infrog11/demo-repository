@@ -17,15 +17,13 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-/* ================================
-   CARGAR CONFIGURACIÓN DEL USUARIO
-   ================================ */
+
 $configResult = $conn->query("SELECT * FROM ConfiguracionUsuario WHERE Cedula = $cedula");
 
 if ($configResult->num_rows > 0) {
     $config = $configResult->fetch_assoc();
 } else {
-    // Valores por defecto si no existe configuración
+    
     $config = [
         "font_size" => 3,
         "theme" => "light",
@@ -33,7 +31,6 @@ if ($configResult->num_rows > 0) {
     ];
 }
 
-// Aplicar configuración
 $fontSize = intval($config["font_size"]) * 4 + 8;
 $themeBg = ($config["theme"] == "dark") ? "#1a1f36" : "#f4f6f9";
 $themeColor = ($config["theme"] == "dark") ? "#eee" : "#000";
@@ -41,9 +38,7 @@ $icons = $config["icons"];
 $linkColor = ($config["theme"] == "dark") ? "#fff" : "#000";
 
 
-/* ================================
-    LÓGICA DE APROBACIÓN Y ROLES
-   ================================ */
+
 
 if (isset($_GET["aprobar"])) {
     $cedulaAprobar = intval($_GET["aprobar"]);

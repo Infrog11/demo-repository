@@ -8,7 +8,6 @@ $ced = $_SESSION['Cedula'];
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- Obtener configuración del usuario ---
 $stmtCfg = $conn->prepare("SELECT font_size, theme FROM ConfiguracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $ced);
 $stmtCfg->execute();
@@ -41,7 +40,6 @@ if ($theme === "dark") {
     $volverBg = "#9b59b6";
 }
 
-// --- Obtener información del usuario ---
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, COALESCE(Pronombres, '') AS Pronombres
     FROM Persona WHERE Cedula = ?
@@ -54,13 +52,11 @@ $nombreCompleto = $usuario['Nombre'] . ' ' . $usuario['Apellido'];
 $idForo = intval($_GET['id'] ?? 0);
 $foro = $conn->query("SELECT * FROM Foros WHERE IdForo = $idForo")->fetch_assoc();
 
-// --- Eliminar respuesta ---
 if (isset($_POST['borrar_respuesta'])) {
     $idRespuesta = intval($_POST['id_respuesta']);
     $conn->query("DELETE FROM Respuestas WHERE IdRespuesta = $idRespuesta AND IdForo = $idForo");
 }
 
-// --- Guardar nueva respuesta ---
 if (isset($_POST['responder'])) {
     $mensaje = $_POST['mensaje'];
     if (!empty($mensaje)) {

@@ -9,7 +9,7 @@ $ced = $_SESSION['Cedula'];
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- Obtener información del usuario ---
+
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, COALESCE(Pronombres,'') AS Pronombres, COALESCE(FotoPerfil,'DefaultPerfile.png') AS FotoPerfil
     FROM Persona WHERE Cedula = ?
@@ -19,7 +19,6 @@ $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 $nombreCompleto = $usuario['Nombre'] . ' ' . $usuario['Apellido'];
 
-// --- Obtener configuración de usuario ---
 $stmtCfg = $conn->prepare("SELECT font_size, theme, icons FROM ConfiguracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $ced);
 $stmtCfg->execute();
@@ -33,7 +32,7 @@ $fontSize = intval($cfg["font_size"]) * 4 + 12;
 $theme = $cfg["theme"];
 $icons = $cfg["icons"];
 
-// --- Tema ---
+
 if ($theme === "dark") {
     $bodyBg = "#1a1f36";
     $textColor = "#ffffff";
@@ -54,7 +53,7 @@ if ($theme === "dark") {
     $inputColor = "#000";
 }
 
-// --- Crear nuevo hilo ---
+
 if (isset($_POST['crear'])) {
     $titulo = trim($_POST['titulo']);
     if (!empty($titulo)) {
@@ -65,7 +64,7 @@ if (isset($_POST['crear'])) {
     }
 }
 
-// --- Reportar foro ---
+
 if (isset($_POST['reportar'])) {
     $idForo = intval($_POST['idforo']);
     $motivo = trim($_POST['motivo']);
@@ -76,7 +75,7 @@ if (isset($_POST['reportar'])) {
     echo "<script>alert('Foro reportado correctamente.');</script>";
 }
 
-// --- Consultar hilos ---
+
 $foros = $conn->query("SELECT * FROM Foros ORDER BY Fecha DESC");
 ?>
 

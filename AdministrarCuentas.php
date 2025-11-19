@@ -6,11 +6,11 @@ if (!isset($_SESSION['Cedula'])) {
 
 $cedula = $_SESSION['Cedula'];
 
-// --- Conexión a la BD ---
+
 $conn = new mysqli("localhost", "root", "equipoinfrog", "proyect_database_mycoop6");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// --- Obtener configuración del usuario ---
+
 $stmtCfg = $conn->prepare("SELECT font_size, theme FROM ConfiguracionUsuario WHERE Cedula = ?");
 $stmtCfg->bind_param("i", $cedula);
 $stmtCfg->execute();
@@ -47,7 +47,7 @@ if ($theme === "dark") {
     $tableBorder = "#ccc";
 }
 
-// --- Obtener información del usuario ---
+
 $stmt = $conn->prepare("
     SELECT Nombre, Apellido, edad AS Edad,
         COALESCE(Pronombres, '') AS Pronombres,
@@ -59,32 +59,31 @@ $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 $nombreCompleto = $usuario['Nombre'] . ' ' . $usuario['Apellido'];
 
-// --- Consultar si el usuario está bloqueado ---
+
 $stmt = $conn->prepare("SELECT Bloqueado FROM Persona WHERE Cedula = ?");
 $stmt->bind_param("i", $cedula);
 $stmt->execute();
 $estadoUsuario = $stmt->get_result()->fetch_assoc();
 $bloqueado = $estadoUsuario['Bloqueado'] ?? 0;
 
-// --- Borrar hilo ---
+
 if (isset($_POST['borrar'])) {
     $id = intval($_POST['idforo']);
     $conn->query("DELETE FROM Foros WHERE IdForo = $id");
 }
 
-// --- Bloquear usuario ---
+
 if (isset($_POST['bloquear_usuario'])) {
     $cedulaBloquear = intval($_POST['cedula_usuario']);
     $conn->query("UPDATE Persona SET Bloqueado = 1 WHERE Cedula = $cedulaBloquear");
 }
 
-// --- Desbloquear usuario ---
+
 if (isset($_POST['desbloquear_usuario'])) {
     $cedulaDesbloquear = intval($_POST['cedula_usuario']);
     $conn->query("UPDATE Persona SET Bloqueado = 0 WHERE Cedula = $cedulaDesbloquear");
 }
 
-// --- Crear nuevo hilo (solo si no está bloqueado) ---
 if (!$bloqueado && isset($_POST['crear'])) {
     $titulo = $_POST['titulo'];
     if (!empty($titulo)) {
@@ -94,10 +93,8 @@ if (!$bloqueado && isset($_POST['crear'])) {
     }
 }
 
-// --- Consultar todos los hilos ---
 $foros = $conn->query("SELECT * FROM Foros ORDER BY Fecha DESC");
 
-// --- Consultar todos los usuarios ---
 $usuarios = $conn->query("SELECT Cedula, Nombre, Apellido, Bloqueado FROM Persona");
 ?>
 
